@@ -79,59 +79,53 @@ int carta_existe(long long int ESTADO, int naipe, int valor) {
 /**
 Funçao que distribui as cartas
 */
-long long int* distribuir(long long int ESTADO) {
+void distribuir(long long int ESTADO,long long int mao []) {
 	int x,y,n;
-	static long long int maos [4]; //fixa a variavel na memoria, enquanto o programa estiver a correr
-	long long int maoUser=0;
-	long long int maoCP1=0;
-	long long int maoCP2=0;
-	long long int maoCP3=0;
+	mao[0]=0; /*mao do user*/
+	mao[1]=0; /*mao do cp1*/
+	mao[2]=0; /*mao do cp2*/
+	mao[3]=0; /*mao do cp3*/
 	srandom(time(NULL));
 	n=0;
 	while (n<13) {
 		x = random() % 4;
 		y = random() % 13;
 		if (carta_existe(ESTADO,x,y)) {
-		maoUser = add_carta(maoUser,x,y);
+		mao[0] = add_carta(mao[0],x,y);
 		ESTADO = rem_carta(ESTADO,x,y);
 		n=n+1;
 		}
 	}
-	maos[0] = maoUser;
 	n=0;
 	while (n<13) {
 		x = random() % 4;
 		y = random() % 13;
 		if (carta_existe(ESTADO,x,y)) {
-		maoCP1 = add_carta(maoCP1,x,y);
+		mao[1] = add_carta(mao[1],x,y);
 		ESTADO = rem_carta(ESTADO,x,y);
 		n=n+1;
 		}
 	}
-	maos[1] = maoCP1;
 	n=0;
 	while (n<13) {
 		x = random() % 4;
 		y = random() % 13;
 		if (carta_existe(ESTADO,x,y)) {
-		maoCP2 = add_carta(maoCP2,x,y);
+		mao[2] = add_carta(mao[2],x,y);
 		ESTADO = rem_carta(ESTADO,x,y);
 		n=n+1;
 		}
 	}
-	maos[2] = maoCP2;
 	n=0;
 	while (n<13) {
 		x = random() % 4;
 		y = random() % 13;
 		if (carta_existe(ESTADO,x,y)) {
-		maoCP3 = add_carta(maoCP3,x,y);
+		mao[3] = add_carta(mao[3],x,y);
 		ESTADO = rem_carta(ESTADO,x,y);
 		n=n+1;
 		}
 	}
-	maos[3] = maoCP3;
-	return (&maos[1]);
 }
 
 /**
@@ -182,17 +176,14 @@ Caso não seja passado nada à cgi-bin, ela assume que todas as cartas estão pr
  */
 void parse(char *query) {
 	long long int ESTADO;
-	//long long int* maos;
-	long long int* maos;
+	long long int mao [4];
 	long long int maoUser;
-	//long long int maoCP1;
+
 	if(sscanf(query, "q=%lld", &ESTADO) == 1) {
 		imprime(BARALHO, ESTADO);
 	} else {
-		maos = distribuir(ESTADO_INICIAL);
-		maoUser = *maos;
-		//printf("%lld", maoUser);
-		//maoCP1 = *((&maoUser) ++);
+		distribuir(ESTADO_INICIAL,mao);
+		maoUser = *mao;
 		imprime(BARALHO, maoUser);
 	}
 }
