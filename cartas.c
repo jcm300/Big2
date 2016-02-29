@@ -130,7 +130,7 @@ long long int* distribuir(long long int ESTADO) {
 		n=n+1;
 		}
 	}
-	maos[1] = maoCP3;
+	maos[3] = maoCP3;
 	return (&maos[1]);
 }
 
