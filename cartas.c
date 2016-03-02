@@ -152,16 +152,16 @@ Esta função está a imprimir o estado em quatro colunas: uma para cada naipe
 */
 void imprime(char *path, long long int ESTADO) {
 	int n, v;
-	int x, y;
+	int x = 20;
 
 	printf("<svg height = \"800\" width = \"800\">\n");
 	printf("<rect x = \"0\" y = \"0\" height = \"800\" width = \"800\" style = \"fill:#007700\"/>\n");
 
-	for(y = 10, n = 0; n < 4; n++, y += 120) {
-		for(x = 10, v = 0; v < 13; v++)
+	for(n = 0; n < 4; n++) {
+		for(v = 0; v < 13; v++)
 			if(carta_existe(ESTADO, n, v)) {
-				x += 20;
-				imprime_carta(path, x, y, ESTADO, n, v);
+				x += 40;
+				imprime_carta(path, x, 10, ESTADO, n, v);
 			}
 	}
 	printf("</svg>\n");
