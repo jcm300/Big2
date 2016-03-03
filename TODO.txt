@@ -1,0 +1,3 @@
+Dispôr cartas por ordem de importancia global
+Adicionar botoes
+Revelar seleção
