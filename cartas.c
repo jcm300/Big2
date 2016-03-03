@@ -151,8 +151,8 @@ void imprime(char *path, long long int ESTADO) {
 	printf("<svg height = \"800\" width = \"850\">\n");
 	printf("<rect x = \"0\" y = \"0\" height = \"800\" width = \"850\" style = \"fill:#007700\"/>\n");
 
-	for(n = 0; n < 4; n++) {
-		for(v = 0; v < 13; v++)
+	for(v = 0; v < 13; v++) {
+		for(n = 0; n < 4; n++)
 			if(carta_existe(ESTADO, n, v)) {
 				x += 50;
 				imprime_carta(path, x, 600, ESTADO, n, v);
