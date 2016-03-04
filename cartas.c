@@ -10,11 +10,13 @@
 #define VALORES		"3456789TJQKA2"
 
 /**
-Estado inicial com todas as 52 cartas do baralho
-Cada carta é representada por um bit que está
-a 1 caso ela pertença à mão ou 0 caso contrário
+Guarda o estado do jogo
+@param mao cada uma das 4 mãos
+@param tamanho o número de cartas em cada mão
+@param selecao Que cartas foram neste momento selecionadas pelo jogador
+@param acao se o jogador carregou em algum botão (e.g., jogar ou passar)
 */
-long long int ESTADO_INICIAL = 0xfffffffffffff;
+
 
 typedef struct {
   	long long unsigned int mao[4];
@@ -70,7 +72,7 @@ int carta_existe(long long int ESTADO, int naipe, int valor) {
 }
 
 
-/*int nrosCartas(long long int MAO){
+int nrosCartas(long long unsigned int MAO){
 	int  a = 0;
 	while(MAO != 0){
 		if(MAO % 2 == 1){
@@ -79,7 +81,7 @@ int carta_existe(long long int ESTADO, int naipe, int valor) {
 		MAO = MAO/2;
 	}
 	return a;
-}*/
+}
 
 
 
@@ -94,9 +96,9 @@ void distribuir(long long int ESTADO,long long unsigned int mao []) {
 		x = random() % 4;
 		y = random() % 13;
 		if (carta_existe(ESTADO,x,y)) {
-		mao[0] = add_carta(mao[0],x,y);
-		ESTADO = rem_carta(ESTADO,x,y);
-		n=n+1;
+			mao[0] = add_carta(mao[0],x,y);
+			ESTADO = rem_carta(ESTADO,x,y);
+			n ++;
 		}
 	}
 	n=0;
@@ -104,9 +106,9 @@ void distribuir(long long int ESTADO,long long unsigned int mao []) {
 		x = random() % 4;
 		y = random() % 13;
 		if (carta_existe(ESTADO,x,y)) {
-		mao[1] = add_carta(mao[1],x,y);
-		ESTADO = rem_carta(ESTADO,x,y);
-		n=n+1;
+			mao[1] = add_carta(mao[1],x,y);
+			ESTADO = rem_carta(ESTADO,x,y);
+			n++;
 		}
 	}
 	n=0;
@@ -116,7 +118,7 @@ void distribuir(long long int ESTADO,long long unsigned int mao []) {
 		if (carta_existe(ESTADO,x,y)) {
 		mao[2] = add_carta(mao[2],x,y);
 		ESTADO = rem_carta(ESTADO,x,y);
-		n=n+1;
+		n ++;
 		}
 	}
 	mao[3] = ESTADO;
@@ -144,19 +146,24 @@ Esta função está a imprimir o estado em quatro colunas: uma para cada naipe
 @param path	o URL correspondente à pasta que contém todas as cartas
 @param ESTADO	O estado atual
 */
-void imprime(char *path, long long int ESTADO) {
+void imprime(char *path, long long unsigned int mao[]) {
 	int n, v;
 	int x = 10;
+	int i, y;
 
+	for(i = 0; i < 4; i ++)
+		printf("<h2>%d</h2>", nrosCartas(mao[i]));
 	printf("<svg height = \"800\" width = \"850\">\n");
 	printf("<rect x = \"0\" y = \"0\" height = \"800\" width = \"850\" style = \"fill:#007700\"/>\n");
 
-	for(v = 0; v < 13; v++) {
-		for(n = 0; n < 4; n++)
-			if(carta_existe(ESTADO, n, v)) {
-				x += 50;
-				imprime_carta(path, x, 600, ESTADO, n, v);
-			}
+	for(y = 10, i = 0; i < 4; i ++, y += 120){
+		for(x = 0, v = 0; v < 13; v++) {
+			for(n = 0; n < 4; n++)
+				if(carta_existe(mao[i], n, v)) {
+					x += 50;
+					imprime_carta(path, x, y, mao[i], n, v);
+				}
+		}
 	}
 	printf("</svg>\n");
 }
@@ -169,14 +176,18 @@ Caso não seja passado nada à cgi-bin, ela assume que todas as cartas estão pr
 @query A query que é passada à cgi-bin
  */
 void parse(char *query,STATE e) {
-	long long unsigned int maoUser;
+	/**
+	Estado inicial com todas as 52 cartas do baralho
+	Cada carta é representada por um bit que está
+	a 1 caso ela pertença à mão ou 0 caso contrário
+	*/
+	const long long int ESTADO_INICIAL = 0xfffffffffffff;
 
-	if(sscanf(query, "q=%llu", &e.mao[0]) == 1) {
-		imprime(BARALHO, e.mao[0]);
+	if(sscanf(query, "q=%llu", e.mao) == 1) {
+		imprime(BARALHO, e.mao);
 	} else {
 		distribuir(ESTADO_INICIAL,e.mao);
-		maoUser = *(e.mao);
-		imprime(BARALHO, maoUser);
+		imprime(BARALHO, e.mao);
 	}
 }
 
@@ -187,7 +198,7 @@ a função que vai imprimir o código html para desenhar as cartas
 int main() {
 
 	STATE e;
-	e.mao[0]=e.mao[2]=e.mao[3]=e.mao[4]=0;
+	e.mao[0]=e.mao[1]=e.mao[2]=e.mao[3]=0;
 /*
  * Cabeçalhos necessários numa CGI
  */
