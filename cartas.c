@@ -141,6 +141,15 @@ void imprime_carta(char *path, int x, int y, long long int ESTADO, int naipe, in
 	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", script, x, y, path, rank[valor], suit[naipe]);
 }
 
+/*void imprime_Bcarta(char *path, int x, int y, long long int ESTADO, int naipe, int valor) {
+	char *suit = NAIPES;
+	char *rank = VALORES;
+	char script[10240];
+	sprintf(script, "%s?q=%lld", SCRIPT, rem_carta(ESTADO, naipe, valor));
+	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", script, x, y, path, 'c', 'B');
+}*/
+
+
 /**
 Esta função está a imprimir o estado em quatro colunas: uma para cada naipe
 @param path	o URL correspondente à pasta que contém todas as cartas
@@ -151,20 +160,29 @@ void imprime(char *path, long long unsigned int mao[]) {
 	int x = 10;
 	int i, y;
 
-	for(i = 0; i < 4; i ++)
-		printf("<h2>%d</h2>", nrosCartas(mao[i]));
+	/*for(i = 0; i < 4; i ++)
+		printf("<h2>%d</h2>", nrosCartas(mao[i]));*/
 	printf("<svg height = \"800\" width = \"850\">\n");
 	printf("<rect x = \"0\" y = \"0\" height = \"800\" width = \"850\" style = \"fill:#007700\"/>\n");
-
-	for(y = 10, i = 0; i < 4; i ++, y += 120){
-		for(x = 0, v = 0; v < 13; v++) {
+    
+    for(i = 0, y = 10; i < 4; i ++, y += 120)
+        for(x = 0, v = 0; v < 13; v++) {
+                for(n = 0; n < 4; n++)
+                    if(carta_existe(mao[i], n, v)) {
+                        x += 50;
+                        imprime_carta(path, x, y, mao[i], n, v);
+                    }
+        }	
+    
+    /*for(i = 1, y = 120; i < 4; y += 120, i++){
+        for(x = 0, v = 0; v < 13; v++) {
 			for(n = 0; n < 4; n++)
 				if(carta_existe(mao[i], n, v)) {
 					x += 50;
-					imprime_carta(path, x, y, mao[i], n, v);
+					imprime_Bcarta(path, x, y, mao[i], n, v);
 				}
-		}
-	}
+        }
+    }*/
 	printf("</svg>\n");
 }
 
