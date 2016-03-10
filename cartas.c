@@ -225,6 +225,8 @@ int main() {
 	printf("<body>\n");
 
 	printf("<h1>Exemplo de utilização</h1>\n");
+    printf("<form action=\"http://127.0.0.1/cgi-bin/cartas\"><input type=\"submit\" value=\"Play\"></form>\n");
+    printf("<form action=\"http://www.pagat.com/climbing/bigtwo.html\"><input type=\"submit\" value=\"Rules\"></form>\n");
 
 /*
  * Ler os valores passados à cgi que estão na variável ambiente e passá-los ao programa
