@@ -84,20 +84,20 @@ int carta_existe(long long int ESTADO, int naipe, int valor) {
 	return (ESTADO >> idx) & 1;
 }
 
+long long int seleciona_carta(long long int SELECAO, int naipe, int valor) {
+	int idx = indice(naipe, valor);
+	return SELECAO | ((long long int) 1 << idx);
 
-int nrosCartas(long long int MAO){
-	int  a = 0;
-	while(MAO != 0){
-		if(MAO % 2 == 1){
-			a ++;
-		}
-		MAO = MAO/2;
-	}
-	return a;
 }
 
 
+/*Verifica se uma dada carta se encontra selecionada*/
+int carta_selecionada(long long int SELECAO, int naipe, int valor){
+	int idx = indice(naipe, valor);	
+	return (SELECAO >> idx);
+}
 
+	
 /**
 Funçao que distribui as cartas
 */
@@ -158,8 +158,9 @@ Imprime o html correspondente a uma carta
 void imprime_carta(char *path, int x, int y, STATE e, int i, int naipe, int valor) {
 	char *suit = NAIPES;
 	char *rank = VALORES;
-	char script[10240]; 
-	rem_carta(e.mao[i], naipe, valor);
+	char script[10240];
+//	e.mao[i] = rem_carta(e.mao[i], naipe, valor);
+	e.tamanho[i] --;	
 	sprintf(script, "%s?%s", SCRIPT, estado2str(e));
 	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", script, x, y, path, rank[valor], suit[naipe]);
 }
@@ -188,14 +189,16 @@ void imprime(char *path, STATE e) {
 	printf("<svg height = \"800\" width = \"850\">\n");
 	printf("<rect x = \"0\" y = \"0\" height = \"800\" width = \"850\" style = \"fill:#007700\"/>\n");
     
-    for(i = 0, y = 10; i < 4; i ++, y += 120)
-        for(x = 0, v = 0; v < 13; v++) {
-                for(n = 0; n < 4; n++)
-                    if(carta_existe(e.mao[i], n, v)) {
-                        x += 50;
-                        imprime_carta(path, x, y, e, i, n, v);
-                    }
-        }	
+	    for(i = 0, y = 10; i < 4; i ++, y += 120)
+       		 for(x = 0, v = 0; v < 13; v++) {
+               		 for(n = 0; n < 4; n++)
+                    		if(carta_existe(e.mao[i], n, v)) {
+					x += 50;
+                        		if(carta_selecionada(e.selecao, n , v))	
+                        			imprime_carta(path, x, (y+20), e, i, n, v);
+                    			else imprime_carta(path, x, y, e, i, n, v);	
+				}
+        	}	
     
     /*for(i = 1, y = 120; i < 4; y += 120, i++){
         for(x = 0, v = 0; v < 13; v++) {
@@ -231,15 +234,13 @@ int main() {
 
 	STATE e;
 	int i;
-    for (i=0;i<4;i++) {
-    	e.mao[i]=0;
-    	e.tamanho[i]=0;
-    }
-    e.selecao=0;
-    e.passar = e.jogar = e.selecionar = 0;
-/*
- * Cabeçalhos necessários numa CGI
- */
+    	for (i=0;i<4;i++) {
+	    	e.mao[i]=0;
+    		e.tamanho[i]=0;
+    	}
+	e.selecao=0x000000000000;
+	e.passar = e.jogar = e.selecionar = 0;
+	
 	printf("Content-Type: text/html; charset=utf-8\n\n");
 	printf("<header><title>Exemplo</title></header>\n");
 	printf("<body>\n");
@@ -248,9 +249,9 @@ int main() {
     /*printf("<form action=\"http://127.0.0.1/cgi-bin/cartas\"><input type=\"submit\" value=\"Play\"></form>\n");
     printf("<form action=\"http://www.pagat.com/climbing/bigtwo.html\"><input type=\"submit\" value=\"Rules\"></form>\n");
 	*/
-    if (strlen(getenv("QUERY_STRING")) != 0){
-    	e = str2estado(getenv("QUERY_STRING"));
-    }
+	if (strlen(getenv("QUERY_STRING")) != 0){
+    		e = str2estado(getenv("QUERY_STRING"));
+    	}
 /*
  * Ler os valores passados à cgi que estão na variável ambiente e passá-los ao programa
  */
