@@ -224,10 +224,10 @@ int main() {
 	e.passar = e.jogar = e.selecionar = 0;
 	
 	printf("Content-Type: text/html; charset=utf-8\n\n");
-	printf("<header><title>Exemplo</title></header>\n");
+	printf("<header><title>Big Two</title></header>\n");
 	printf("<body>\n");
 
-	printf("<h1>Exemplo de utilização</h1>\n");
+	printf("<h1>BIG TWO</h1>\n");
     	/*printf("<form action=\"http://127.0.0.1/cgi-bin/cartas\"><input type=\"submit\" value=\"Play\"></form>\n");
     	printf("<form action=\"http://www.pagat.com/climbing/bigtwo.html\"><input type=\"submit\" value=\"Rules\"></form>\n");
 	*/
