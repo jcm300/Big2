@@ -84,20 +84,6 @@ int carta_existe(long long int ESTADO, int naipe, int valor) {
 	return (ESTADO >> idx) & 1;
 }
 
-long long int seleciona_carta(long long int SELECAO, int naipe, int valor) {
-	int idx = indice(naipe, valor);
-	return SELECAO | ((long long int) 1 << idx);
-
-}
-
-
-/*Verifica se uma dada carta se encontra selecionada*/
-int carta_selecionada(long long int SELECAO, int naipe, int valor){
-	int idx = indice(naipe, valor);	
-	return (SELECAO >> idx) & 1;
-}
-
-	
 /**
 Funçao que distribui as cartas
 */
@@ -160,7 +146,11 @@ void imprime_carta(char *path, int x, int y, STATE e, int i, int naipe, int valo
 	char *rank = VALORES;
 	char script[10240];
 //	e.mao[i] = rem_carta(e.mao[i], naipe, valor);
-	e.selecao = seleciona_carta(e.selecao, naipe, valor);	
+	if (carta_existe(e.selecao,naipe,valor)) {
+		e.selecao = rem_carta(e.selecao, naipe, valor);
+	}else { 
+		e.selecao = add_carta(e.selecao, naipe, valor);	
+	}
 	e.tamanho[i] --;	
 	sprintf(script, "%s?%s", SCRIPT, estado2str(e));
 	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", script, x, y, path, rank[valor], suit[naipe]);
@@ -195,7 +185,7 @@ void imprime(char *path, STATE e) {
 			for(n = 0; n < 4; n++)
  				if(carta_existe(e.mao[i], n, v)) {
 					x += 50;
-                        		if(carta_selecionada(e.selecao, n , v))	
+                        		if(carta_existe(e.selecao, n , v))	
                         			imprime_carta(path, x, (y-20), e, i, n, v);
                     			else imprime_carta(path, x, y, e, i, n, v);	
 				}
