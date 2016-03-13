@@ -145,7 +145,6 @@ void imprime_carta(char *path, int x, int y, STATE e, int i, int naipe, int valo
 	char *suit = NAIPES;
 	char *rank = VALORES;
 	char script[10240];
-//	e.mao[i] = rem_carta(e.mao[i], naipe, valor);
 	if (carta_existe(e.selecao,naipe,valor)) {
 		e.selecao = rem_carta(e.selecao, naipe, valor);
 	}else { 
@@ -156,13 +155,11 @@ void imprime_carta(char *path, int x, int y, STATE e, int i, int naipe, int valo
 	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", script, x, y, path, rank[valor], suit[naipe]);
 }
 
-/*void imprime_Bcarta(char *path, int x, int y, long long int ESTADO, int naipe, int valor) {
-	char *suit = NAIPES;
-	char *rank = VALORES;
+void imprime_Bcarta(char *path, int x, int y, STATE e, int i) {
 	char script[10240];
-	sprintf(script, "%s?q=%lld", SCRIPT, rem_carta(ESTADO, naipe, valor));
+	sprintf(script, "%s?%s", SCRIPT, estado2str(e));
 	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", script, x, y, path, 'c', 'B');
-}*/
+}
 
 
 /**
@@ -179,18 +176,27 @@ void imprime(char *path, STATE e) {
 		printf("<h2>%d</h2>", nrosCartas(mao[i]));*/
 	printf("<svg height = \"900\" width = \"850\">\n");
 	printf("<rect x = \"0\" y = \"0\" height = \"900\" width = \"850\" style = \"fill:#007700\"/>\n");
-    
-	for(i = 0, y = 30; i < 4; i ++, y += 200)
-		for(x = 0, v = 0; v < 13; v++) {
-			for(n = 0; n < 4; n++)
- 				if(carta_existe(e.mao[i], n, v)) {
+   	y = 30;
+	for(i = 0; i < 4; i ++, y +=200) 
+	for(x = 0, v = 0; v < 13; v++) {
+		for(n = 0; n < 4; n++)
+ 			if(carta_existe(e.mao[i], n, v)) {
+				x += 50;
+                        	if(carta_existe(e.selecao, n , v))	
+                        		imprime_carta(path, x, (y-20), e, i, n, v);
+                    		else imprime_carta(path, x, y, e, i, n, v);	
+			}
+        }	
+/**	for(i = 1, y = 230; i < 3; i ++, y += 200)
+		for(x = 0, v = 0; v < 13; v ++){
+			for(n = 0; n < 4; n ++){
+				if(carta_existe(e.mao[i], n, v)){
 					x += 50;
-                        		if(carta_existe(e.selecao, n , v))	
-                        			imprime_carta(path, x, (y-20), e, i, n, v);
-                    			else imprime_carta(path, x, y, e, i, n, v);	
+					imprime_Bcarta(path, x, y, e, i);
 				}
-        	}	
-    
+			} 		    
+		}
+*/
 	printf("</svg>\n");
 }
 
@@ -207,6 +213,7 @@ void parse(STATE e) {
 	}
 	imprime(BARALHO, e);
 }
+
 
 /**
 Função principal do programa que imprime os cabeçalhos necessários e depois disso invoca
