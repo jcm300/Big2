@@ -145,6 +145,9 @@ void imprime_carta(char *path, int x, int y, STATE e, int i, int naipe, int valo
 	char *suit = NAIPES;
 	char *rank = VALORES;
 	char script[10240];
+	/*if (carta_existe(e.selecao, naipe, valor)&& e.jogar == 1){
+		e.mao[i] = rem_carta(e.mao[i], naipe, valor);
+	}*/
 	if (carta_existe(e.selecao,naipe,valor)) {
 		e.selecao = rem_carta(e.selecao, naipe, valor);
 	}else { 
@@ -158,7 +161,7 @@ void imprime_carta(char *path, int x, int y, STATE e, int i, int naipe, int valo
 void imprime_Bcarta(char *path, int x, int y, STATE e, int i) {
 	char script[10240];
 	sprintf(script, "%s?%s", SCRIPT, estado2str(e));
-	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", script, x, y, path, 'c', 'B');
+	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", script, x, y, path, 'c', 'B'); 
 }
 
 
@@ -213,8 +216,6 @@ void parse(STATE e) {
 	}
 	imprime(BARALHO, e);
 }
-
-
 /**
 Função principal do programa que imprime os cabeçalhos necessários e depois disso invoca
 a função que vai imprimir o código html para desenhar as cartas
@@ -233,16 +234,14 @@ int main() {
 	printf("Content-Type: text/html; charset=utf-8\n\n");
 	printf("<header><title>Big Two</title></header>\n");
 	printf("<body>\n");
-
+	
+//	printf("<form action=\"%s?%s\"><input type=\"submit\" value =\"Play\"></form>", SCRIPT, estado2str(e));
 	printf("<h1>BIG TWO</h1>\n");
-    	/*printf("<form action=\"http://127.0.0.1/cgi-bin/cartas\"><input type=\"submit\" value=\"Play\"></form>\n");
-    	printf("<form action=\"http://www.pagat.com/climbing/bigtwo.html\"><input type=\"submit\" value=\"Rules\"></form>\n");
-	*/
-	if (strlen(getenv("QUERY_STRING")) != 0){
+	if(strlen(getenv("QUERY_STRING")) != 0){
     		e = str2estado(getenv("QUERY_STRING"));
     	}
-/*
- * Ler os valores passados à cgi que estão na variável ambiente e passá-los ao programa
+
+/* * Ler os valores passados à cgi que estão na variável ambiente e passá-los ao programa
  */
 	parse(e);
 
