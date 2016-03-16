@@ -158,12 +158,13 @@ void imprime_carta(char *path, int x, int y, STATE e, int i, int naipe, int valo
 	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", script, x, y, path, rank[valor], suit[naipe]);
 }
 
+/*
 void imprime_Bcarta(char *path, int x, int y, STATE e, int i) {
 	char script[10240];
 	sprintf(script, "%s?%s", SCRIPT, estado2str(e));
 	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", script, x, y, path, 'c', 'B'); 
 }
-
+*/
 
 /**
 Esta função está a imprimir o estado em quatro colunas: uma para cada naipe
@@ -211,11 +212,41 @@ Caso não seja passado nada à cgi-bin, ela assume que todas as cartas estão pr
 @query A query que é passada à cgi-bin
  */
 void parse(STATE e) {
+	int n, v;
 	if(e.mao[0] == 0) {
 		e = distribuir(e);
 	}
+	if (e.jogar==1) {
+		for(v = 0; v < 13; v++) {
+			for(n = 0; n < 4; n++)
+				if (carta_existe(e.selecao, n, v)) {
+					rem_carta(e.selecao, n, v);
+				}
+		}
+		e.jogar=0;
+	}
+	if (e.passar==1) {
+		for(v = 0; v < 13; v++) {
+			for(n = 0; n < 4; n++)
+				if (carta_existe(e.selecao, n, v)) {
+					rem_carta(e.selecao, n, v);
+				}
+		}
+		e.passar=0;
+	}
 	imprime(BARALHO, e);
 }
+
+STATE estadoplay (STATE e) {
+	e.jogar=1;
+	return e;
+}
+
+STATE estadopass (STATE e) {
+	e.passar=1;
+	return e;
+}
+
 /**
 Função principal do programa que imprime os cabeçalhos necessários e depois disso invoca
 a função que vai imprimir o código html para desenhar as cartas
@@ -235,11 +266,14 @@ int main() {
 	printf("<header><title>Big Two</title></header>\n");
 	printf("<body>\n");
 	
-//	printf("<form action=\"%s?%s\"><input type=\"submit\" value =\"Play\"></form>", SCRIPT, estado2str(e));
 	printf("<h1>BIG TWO</h1>\n");
+	
 	if(strlen(getenv("QUERY_STRING")) != 0){
     		e = str2estado(getenv("QUERY_STRING"));
     	}
+
+	printf("<form action=\"%s_%s\"><input type=\"submit\" value =\"Play\"></form>", SCRIPT, estado2str(estadoplay(e)));
+    printf("<form action=\"%s_%s\"><input type=\"submit\" value =\"Pass\"></form>", SCRIPT, estado2str(estadopass(e)));
 
 /* * Ler os valores passados à cgi que estão na variável ambiente e passá-los ao programa
  */
