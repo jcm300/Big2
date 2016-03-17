@@ -201,9 +201,9 @@ void imprime_butoes(int x, int y, STATE e, int jv){
 	}
 }
 
-/*int jogadaValida(STATE e){
+int jogadaValida(STATE e, MAO jogadaAnt){
 
-}*/
+}
 
 /** Funçao que retira as cartas de uma mao caso ja esteja presente na seleçao*/
 MAO retira_cartas (MAO mao, MAO s) {
@@ -217,14 +217,22 @@ MAO retira_cartas (MAO mao, MAO s) {
      return mao;
 }
 
-void joga_cartas_cpu (STATE e) {
+void joga_cartas_cpu (STATE e, MAO selecao) {
 	int n,v,i=0;
+	int x=10,y=10;
+	MAO temp=selecao;
 	for (i=0;i<3;i++) {
+		y+=120;
 		for(v = 0; v < 13; v++) {
-			for(n = 0; n < 4; n++)
-				if(carta_existe(e.mao[i], n, v) && jogada_valida==1) {
+			for(n = 0; n < 4; n++) {
+				if(carta_existe(e.mao[i], n, v) && jogada_valida(temp)==1) {
+					imprime_carta(x,y,e,i,n,v);
+					temp=retira_cartas(temp,selecao);
+					temp=add_carta(temp,n,v);
 					e.mao[i]=rem_carta(e.mao[i],n,v);
 				}
+				x+=50;
+			}
         }
 	}
 }
@@ -243,7 +251,7 @@ void imprime(STATE e) {
 	if (e.acao==3) {
 		imprime_mao(500,390,e,e.selecao,4);
 		e.mao[3]=retira_cartas(e.mao[3],e.selecao);
-		joga_cartas_cpu(e);
+		joga_cartas_cpu(e,e.selecao);
 		e.selecao=0;
 		e.acao=0;
 	}
