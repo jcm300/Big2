@@ -17,13 +17,13 @@ Guarda o estado do jogo
 @param selecao Que cartas foram neste momento selecionadas pelo jogador
 @param acao se o jogador carregou em algum botão (e.g., jogar ou passar)
 */
-
+typedef long long int MAO;
 
 typedef struct {
   	long long int mao[4];
   	int tamanho[4];
   	long long int selecao;
-  	int passar, jogar, selecionar;
+  	int acao, jogar, selecionar;
 	} STATE;
 
 /**
@@ -38,13 +38,13 @@ int indice(int naipe, int valor) {
 
 STATE str2estado (char* str) {
 	STATE e;
-	sscanf(str, FORMATO, &e.mao[0], &e.mao[1], &e.mao[2], &e.mao[3], &e.tamanho[0], &e.tamanho[1], &e.tamanho[2],&e.tamanho[3], &e.selecao, &e.passar, &e.selecionar, &e.jogar);
+	sscanf(str, FORMATO, &e.mao[0], &e.mao[1], &e.mao[2], &e.mao[3], &e.tamanho[0], &e.tamanho[1], &e.tamanho[2],&e.tamanho[3], &e.selecao, &e.acao, &e.selecionar, &e.jogar);
 	return e;
 }
 
 char* estado2str (STATE e){
 	static char res[10240];
-	sprintf(res, FORMATO, e.mao[0], e.mao[1], e.mao[2], e.mao[3], e.tamanho[0],e.tamanho[1],e.tamanho[2],e.tamanho[3], e.selecao, e.passar, e.selecionar, e.jogar);
+	sprintf(res, FORMATO, e.mao[0], e.mao[1], e.mao[2], e.mao[3], e.tamanho[0],e.tamanho[1],e.tamanho[2],e.tamanho[3], e.selecao, e.acao, e.selecionar, e.jogar);
 	return res;
 }
 
@@ -141,7 +141,7 @@ Imprime o html correspondente a uma carta
 @param naipe	O naipe da carta (inteiro entre 0 e 3)
 @param valor	O valor da carta (inteiro entre 0 e 12)
 */
-void imprime_carta(char *path, int x, int y, STATE e, int i, int naipe, int valor) {
+void imprime_carta(int x, int y, STATE e, int i, int naipe, int valor) {
 	char *suit = NAIPES;
 	char *rank = VALORES;
 	char script[10240];
@@ -153,9 +153,9 @@ void imprime_carta(char *path, int x, int y, STATE e, int i, int naipe, int valo
 	}else { 
 		e.selecao = add_carta(e.selecao, naipe, valor);	
 	}
-	e.tamanho[i] --;	
+	//e.tamanho[i] --;	
 	sprintf(script, "%s?%s", SCRIPT, estado2str(e));
-	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", script, x, y, path, rank[valor], suit[naipe]);
+	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", script, x, y, BARALHO, rank[valor], suit[naipe]);
 }
 
 /*
@@ -166,44 +166,96 @@ void imprime_Bcarta(char *path, int x, int y, STATE e, int i) {
 }
 */
 
+
+void imprime_mao(int x, int y, STATE e, MAO mao, int m) {
+	int n, v;
+
+/*	printf("<svg height = \"900\" width = \"850\">\n");
+	printf("<rect x = \"0\" y = \"0\" height = \"900\" width = \"850\" style = \"fill:#007700\"/>\n");*/
+	for(x = 0, v = 0; v < 13; v++) {
+		for(n = 0; n < 4; n++)
+ 			if(carta_existe(mao, n, v)) {
+				x += 30;
+                        	if(carta_existe(e.selecao, n , v))	
+                        		imprime_carta(x, (y-20), e, m, n, v);
+                    		else imprime_carta(x, y, e, m, n, v);
+			}
+        }
+	/*for(v = 0; v < 13; v++) {
+		for(n = 0; n < 4; n++)
+			if (m==3) {
+				if(carta_existe(mao, n, v)) {
+				x += 30;
+                    if(carta_existe(e.selecao, n , v))	
+                        imprime_carta(x, (y-20), e, m, n, v);
+                    else imprime_carta(x, y, e, m, n, v);
+				}
+			} else {
+				if(carta_existe(mao, n, v)) {
+					x += 30;
+                    imprime_carta(x, y, e, m, n, v);
+				}	
+			}
+        }*/	
+//	printf("</svg>\n");
+}
+
+void imprime_butoes(int x, int y, STATE e, int jv){
+	char script[10240];	
+	e.acao=1;
+	sprintf(script, "%s?%s", SCRIPT, estado2str(e));
+	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/baralhar.png\" /></a>\n", script, x, y, BARALHO);
+	e.acao=2;
+	sprintf(script, "%s?%s", SCRIPT, estado2str(e));
+	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/Passa.png\" /></a>\n", script, x+100, y, BARALHO);
+	e.acao=3;
+	if (jv==1) {
+	sprintf(script, "%s?%s", SCRIPT, estado2str(e));
+	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/Jogar_enabled.png\" /></a>\n", script, x+200, y, BARALHO);
+	} else {
+		printf("<image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/Jogar_disabled.png\" />\n", x+200, y, BARALHO);
+	}
+}
+
+
+MAO retira_cartas (MAO mao, MAO s) {
+	int n,v;
+	for(v = 0; v < 13; v++) {
+		for(n = 0; n < 4; n++)
+				if(carta_existe(s, n, v)) {
+					mao=rem_carta(mao,n,v);
+			}
+        }	
+     return mao;
+}
+
 /**
 Esta função está a imprimir o estado em quatro colunas: uma para cada naipe
 @param path	o URL correspondente à pasta que contém todas as cartas
 @param ESTADO	O estado atual
 */
-void imprime(char *path, STATE e) {
-	int n, v;
-	int x = 10;
-	int i, y;
+void imprime(STATE e) {
 
 	/*for(i = 0; i < 4; i ++)
 		printf("<h2>%d</h2>", nrosCartas(mao[i]));*/
 	printf("<svg height = \"900\" width = \"850\">\n");
-	printf("<rect x = \"0\" y = \"0\" height = \"900\" width = \"850\" style = \"fill:#007700\"/>\n");
-   	y = 30;
-	for(i = 0; i < 4; i ++, y +=200) 
-	for(x = 0, v = 0; v < 13; v++) {
-		for(n = 0; n < 4; n++)
- 			if(carta_existe(e.mao[i], n, v)) {
-				x += 50;
-                        	if(carta_existe(e.selecao, n , v))	
-                        		imprime_carta(path, x, (y-20), e, i, n, v);
-                    		else imprime_carta(path, x, y, e, i, n, v);	
-			}
-        }	
-/**	for(i = 1, y = 230; i < 3; i ++, y += 200)
-		for(x = 0, v = 0; v < 13; v ++){
-			for(n = 0; n < 4; n ++){
-				if(carta_existe(e.mao[i], n, v)){
-					x += 50;
-					imprime_Bcarta(path, x, y, e, i);
-				}
-			} 		    
-		}
-*/
+	printf("<rect x = \"0\" y = \"0\" height = \"900\" width = \"850\" style = \"fill:#007700\"/>\n"); 
+	if (e.acao==3) {
+		imprime_mao(500,390,e,e.selecao,4);
+		e.mao[3]=retira_cartas(e.mao[3],e.selecao);
+		e.acao=0;
+	}
+	imprime_mao(10,10,e,e.mao[0],0);
+	imprime_mao(10,130,e,e.mao[1],1);
+	imprime_mao(10,250,e,e.mao[2],2);
+	imprime_mao(10,390,e,e.mao[3],3);
+
+	//jv=jogada_valida(e);
+	imprime_butoes(40,510,e,0);
+
 	printf("</svg>\n");
 }
-
+/*
 STATE estadoplay (STATE e) {
 	e.jogar=1;
 	return e;
@@ -212,7 +264,7 @@ STATE estadoplay (STATE e) {
 STATE estadopass (STATE e) {
 	e.passar=1;
 	return e;
-}
+}*/
 /**
 Esta função recebe a query que é passada à cgi-bin e trata-a.
 Neste momento, a query contém o estado que é um inteiro que representa um conjunto de cartas.
@@ -227,13 +279,8 @@ void parse(STATE e) {
 	if(e.mao[0] == 0) {
 		e = distribuir(e);
 	}
-	printf("<form action=\"%s?%s\"><input type=\"submit\" value =\"Play\"></form>\n", SCRIPT, estado2str(estadoplay(e))); 
-	printf("<form action=\"%s?%s\"><input type=\"submit\" value =\"Pass\"></form>\n", SCRIPT, estado2str(estadopass(e)));
-	//e = str2estado(getenv("QUERY_STRING"));	
 
-	printf("<h1>%s</h1>", estado2str(e));
-
-	if (e.jogar==1) {
+/*	if (e.jogar==1) {
 		for(v = 0; v < 13; v++) {
 			for(n = 0; n < 4; n++)
 				if (carta_existe(e.selecao, n, v)) {
@@ -251,8 +298,8 @@ void parse(STATE e) {
 		}
 		e.passar=0;
 	}
-	
-	imprime(BARALHO, e);
+*/	
+	imprime(e);
 }
 
 /**
@@ -268,7 +315,7 @@ int main() {
     		e.tamanho[i]=0;
     	}
 	e.selecao=0x000000000000;
-	e.passar = e.jogar = e.selecionar = 0;
+	e.acao = e.jogar = e.selecionar = 0;
 	
 	printf("Content-Type: text/html; charset=utf-8\n\n");
 	printf("<header><title>Big Two</title></header>\n");
