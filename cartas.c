@@ -223,13 +223,16 @@ Caso não seja passado nada à cgi-bin, ela assume que todas as cartas estão pr
 void parse(STATE e) {
 	int n, v;
 
-	printf("<form action=\"%s?%s\"><input type=\"submit\" value =\"Play\"></form>\n", SCRIPT, estado2str(estadoplay(e))); 
-	printf("<form action=\"%s?%s\"><input type=\"submit\" value =\"Pass\"></form>\n", SCRIPT, estado2str(estadopass(e)));
-	e = str2estado(getenv("QUERY_STRING"));	
-
+	
 	if(e.mao[0] == 0) {
 		e = distribuir(e);
 	}
+	printf("<form action=\"%s?%s\"><input type=\"submit\" value =\"Play\"></form>\n", SCRIPT, estado2str(estadoplay(e))); 
+	printf("<form action=\"%s?%s\"><input type=\"submit\" value =\"Pass\"></form>\n", SCRIPT, estado2str(estadopass(e)));
+	//e = str2estado(getenv("QUERY_STRING"));	
+
+	printf("<h1>%s</h1>", estado2str(e));
+
 	if (e.jogar==1) {
 		for(v = 0; v < 13; v++) {
 			for(n = 0; n < 4; n++)
@@ -277,9 +280,8 @@ int main() {
     		e = str2estado(getenv("QUERY_STRING"));
     	}	
 
-		
 	parse(e);
-	
+		
 /* * Ler os valores passados à cgi que estão na variável ambiente e passá-los ao programa
  */
 
