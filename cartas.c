@@ -8,7 +8,7 @@
 
 #define NAIPES		"DCHS"
 #define VALORES		"3456789TJQKA2"
-#define FORMATO "%lld_%lld_%lld_%lld_%d_%d_%d_%d_%lld_%d_%d_%d"
+#define FORMATO 	"%lld_%lld_%lld_%lld_%d_%d_%d_%d_%lld_%d_%d_%d"
 
 /**
 Guarda o estado do jogo
@@ -145,9 +145,9 @@ void imprime_carta(char *path, int x, int y, STATE e, int i, int naipe, int valo
 	char *suit = NAIPES;
 	char *rank = VALORES;
 	char script[10240];
-	/*if (carta_existe(e.selecao, naipe, valor)&& e.jogar == 1){
+	if (carta_existe(e.selecao, naipe, valor)&& e.jogar == 1){
 		e.mao[i] = rem_carta(e.mao[i], naipe, valor);
-	}*/
+	}
 	if (carta_existe(e.selecao,naipe,valor)) {
 		e.selecao = rem_carta(e.selecao, naipe, valor);
 	}else { 
@@ -204,6 +204,15 @@ void imprime(char *path, STATE e) {
 	printf("</svg>\n");
 }
 
+STATE estadoplay (STATE e) {
+	e.jogar=1;
+	return e;
+}
+
+STATE estadopass (STATE e) {
+	e.passar=1;
+	return e;
+}
 /**
 Esta função recebe a query que é passada à cgi-bin e trata-a.
 Neste momento, a query contém o estado que é um inteiro que representa um conjunto de cartas.
@@ -213,6 +222,11 @@ Caso não seja passado nada à cgi-bin, ela assume que todas as cartas estão pr
  */
 void parse(STATE e) {
 	int n, v;
+
+	printf("<form action=\"%s?%s\"><input type=\"submit\" value =\"Play\"></form>\n", SCRIPT, estado2str(estadoplay(e))); 
+	printf("<form action=\"%s?%s\"><input type=\"submit\" value =\"Pass\"></form>\n", SCRIPT, estado2str(estadopass(e)));
+	e = str2estado(getenv("QUERY_STRING"));	
+
 	if(e.mao[0] == 0) {
 		e = distribuir(e);
 	}
@@ -234,17 +248,8 @@ void parse(STATE e) {
 		}
 		e.passar=0;
 	}
+	
 	imprime(BARALHO, e);
-}
-
-STATE estadoplay (STATE e) {
-	e.jogar=1;
-	return e;
-}
-
-STATE estadopass (STATE e) {
-	e.passar=1;
-	return e;
 }
 
 /**
@@ -265,19 +270,18 @@ int main() {
 	printf("Content-Type: text/html; charset=utf-8\n\n");
 	printf("<header><title>Big Two</title></header>\n");
 	printf("<body>\n");
-	
+		
 	printf("<h1>BIG TWO</h1>\n");
 	
 	if(strlen(getenv("QUERY_STRING")) != 0){
     		e = str2estado(getenv("QUERY_STRING"));
-    	}
+    	}	
 
-	printf("<form action=\"%s_%s\"><input type=\"submit\" value =\"Play\"></form>", SCRIPT, estado2str(estadoplay(e)));
-    printf("<form action=\"%s_%s\"><input type=\"submit\" value =\"Pass\"></form>", SCRIPT, estado2str(estadopass(e)));
-
+		
+	parse(e);
+	
 /* * Ler os valores passados à cgi que estão na variável ambiente e passá-los ao programa
  */
-	parse(e);
 
 	printf("</body>\n");
 	return 0;
