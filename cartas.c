@@ -84,6 +84,20 @@ int carta_existe(long long int ESTADO, int naipe, int valor) {
 	return (ESTADO >> idx) & 1;
 }
 
+int nroCartas(MAO m){
+
+	int r = 0;
+
+	while(m > 0){
+		if(m%2 == 1) r ++;
+		m /= 2;
+	}
+	return r;	
+}
+
+
+
+
 /**
 Funçao que distribui as cartas
 */
@@ -141,7 +155,7 @@ Imprime o html correspondente a uma carta
 @param naipe	O naipe da carta (inteiro entre 0 e 3)
 @param valor	O valor da carta (inteiro entre 0 e 12)
 */
-void imprime_carta(int x, int y, STATE e, int i, int naipe, int valor) {
+void imprime_carta(int x, int y, STATE e, int naipe, int valor) {
 	char *suit = NAIPES;
 	char *rank = VALORES;
 	char script[10240];
@@ -171,14 +185,14 @@ void imprime_mao(int x, int y, STATE e, MAO mao, int m) {
 			if (m==3) {
 				if(carta_existe(mao, n, v)) {
 					x += 30;
-                    if(carta_existe(e.selecao, n , v))	
-                        imprime_carta(x, (y-20), e, m, n, v);
-                    else imprime_carta(x, y, e, m, n, v);
+					if(carta_existe(e.selecao, n , v))	
+                        			imprime_carta(x, (y-20), e, n, v);
+                    			else imprime_carta(x, y, e, n, v);
 				}
 			} else {
 				if(carta_existe(mao, n, v)) {
 					x += 30;
-                    imprime_carta(x, y, e, m, n, v);
+					imprime_carta(x, y, e, n, v);
 				}	
 			}
     }	
@@ -201,9 +215,49 @@ void imprime_butoes(int x, int y, STATE e, int jv){
 	}
 }
 
-int jogadaValida(STATE e, MAO jogadaAnt){
+int comparaValores(MAO jogadaAnt, MAO jogadaAtual){
+	int c  = 0, v1 = 0, v2 = 0, n1 = 0, n2 = 0;
 
+	while(jogadaAnt > 0){
+		if(c > 12){
+			c = 0;
+			n1 ++;
+		}
+		if(jogadaAnt%2 == 1){
+			v1 = c;
+			break;
+		}
+		jogadaAnt /=2;
+		c ++;
+	}
+	c = 0;
+	while(jogadaAtual > 0){
+		if(c > 12){
+			c = 0;
+			n2 ++;
+		}
+		if(jogadaAtual%2 == 1){
+			v2 = c;
+			break;		
+		}
+		jogadaAtual /=2;
+		c ++;
+	}
+	if(v1 == v2) return (n1 < n2);
+	else return (v1<v2);
 }
+
+
+int jogadaValida(MAO jogadaAnt, MAO jogadaAtual){
+
+	int nroAg, nroAnt;
+	nroAnt = nroCartas(jogadaAnt);
+	nroAg = nroCartas(jogadaAtual);
+	if(nroAnt != nroAg) return 0;
+	else if(comparaValores(jogadaAnt, jogadaAtual)) return 1;
+	else return 0;
+}
+
 
 /** Funçao que retira as cartas de uma mao caso ja esteja presente na seleçao*/
 MAO retira_cartas (MAO mao, MAO s) {
@@ -213,27 +267,31 @@ MAO retira_cartas (MAO mao, MAO s) {
 				if(carta_existe(s, n, v)) {
 					mao=rem_carta(mao,n,v);
 			}
-        }	
-     return mao;
+	}	
+	return mao;
 }
 
-void joga_cartas_cpu (STATE e, MAO selecao) {
+void joga_cartas_cpu (STATE e, MAO jogadaAnterior) {
 	int n,v,i=0;
 	int x=10,y=10;
-	MAO temp=selecao;
-	for (i=0;i<3;i++) {
-		y+=120;
-		for(v = 0; v < 13; v++) {
-			for(n = 0; n < 4; n++) {
-				if(carta_existe(e.mao[i], n, v) && jogada_valida(temp)==1) {
-					imprime_carta(x,y,e,i,n,v);
-					temp=retira_cartas(temp,selecao);
-					temp=add_carta(temp,n,v);
-					e.mao[i]=rem_carta(e.mao[i],n,v);
+	MAO temp=0x000000000000;
+	for (y = 10, i=0;i<3;i++,  y+=120) {
+		x = 500;
+		for(v = 0; v < 13; v++){
+			for(n = 0; n < 4; n++){
+				if(carta_existe(e.mao[i], n, v) ) {
+					temp=add_carta(temp, n, v);
+					if(comparaValores(jogadaAnterior, temp)){
+						x += 40;
+						e.mao[i]=rem_carta(e.mao[i],n,v);
+						imprime_carta(x,y,e,n,v);
+						v = 13;
+						n = 4;
+					}
+					temp = retira_cartas(temp, temp);
 				}
-				x+=50;
 			}
-        }
+		}
 	}
 }
 	
@@ -246,8 +304,8 @@ Esta função está a imprimir o estado em quatro colunas: uma para cada naipe
 void imprime(STATE e) {
 	//int jv;
 	
-	printf("<svg height = \"900\" width = \"850\">\n");
-	printf("<rect x = \"0\" y = \"0\" height = \"900\" width = \"850\" style = \"fill:#007700\"/>\n"); 
+	printf("<svg height = \"900\" width = \"1050\">\n");
+	printf("<rect x = \"0\" y = \"0\" height = \"900\" width = \"1050\" style = \"fill:#007700\"/>\n"); 
 	if (e.acao==3) {
 		imprime_mao(500,390,e,e.selecao,4);
 		e.mao[3]=retira_cartas(e.mao[3],e.selecao);
@@ -308,9 +366,10 @@ int main() {
 		for (i=0;i<4;i++) {
 	    		e.mao[i]=0;
     			e.tamanho[i]=0;
-    			e.acao=0;
-    			e.selecao=0;
-    		}
+    			}
+		e.acao=0;
+		e.selecao=0;
+    		
 	}
 
 	parse(e);
