@@ -159,10 +159,12 @@ void imprime_carta(int x, int y, STATE e, int naipe, int valor) {
 	char *suit = NAIPES;
 	char *rank = VALORES;
 	char script[10240];
-	if (carta_existe(e.selecao,naipe,valor)) {
-		e.selecao = rem_carta(e.selecao, naipe, valor);
-	}else { 
-		e.selecao = add_carta(e.selecao, naipe, valor);	
+	if (carta_existe(e.mao[3],naipe,valor)) {
+		if (carta_existe(e.selecao,naipe,valor)) {
+			e.selecao = rem_carta(e.selecao, naipe, valor);
+		}else { 
+			e.selecao = add_carta(e.selecao, naipe, valor);	
+		}
 	}
 	sprintf(script, "%s?%s", SCRIPT, estado2str(e));
 	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", script, x, y, BARALHO, rank[valor], suit[naipe]);
@@ -271,7 +273,7 @@ MAO retira_cartas (MAO mao, MAO s) {
 	return mao;
 }
 
-void joga_cartas_cpu (STATE e, MAO jogadaAnterior) {
+MAO joga_cartas_cpu (STATE e, MAO jogadaAnterior, int passa) {
 	int n,v,i=0;
 	int x=10,y=10;
 	MAO temp=0x000000000000;
@@ -281,36 +283,70 @@ void joga_cartas_cpu (STATE e, MAO jogadaAnterior) {
 			for(n = 0; n < 4; n++){
 				if(carta_existe(e.mao[i], n, v) ) {
 					temp=add_carta(temp, n, v);
-					if(comparaValores(jogadaAnterior, temp)){
+					if (passa==3) {
 						x += 40;
-						e.mao[i]=rem_carta(e.mao[i],n,v);
+						e.mao[i]=retira_cartas(e.mao[i],temp);
 						imprime_carta(x,y,e,n,v);
 						v = 13;
 						n = 4;
+						jogadaAnterior=temp;
+						passa=0;
+					} else {
+						if(comparaValores(jogadaAnterior, temp)){
+							x += 40;
+							e.mao[i]=retira_cartas(e.mao[i],temp);
+							imprime_carta(x,y,e,n,v);
+							v = 13;
+							n = 4;
+							jogadaAnterior=temp;
+						}
 					}
 					temp = retira_cartas(temp, temp);
 				}
 			}
 		}
 	}
+	return jogadaAnterior;
 }
 	
-
+MAO joga_fst_cartacpu (STATE e, int mi) {
+	int x=500,y=10, i=0;
+	MAO jogada_Anterior=0;
+	for (y = 10, i=0;i<3;i++,  y+=120) {
+		if (i==mi) {
+			imprime_carta(x,y,e,0,0);
+			jogada_Anterior=add_carta(jogada_Anterior,0,0);
+			e.mao[i]=rem_carta(e.mao[i],0,0);
+		}
+		i++;
+	}
+	return jogada_Anterior;
+}
 /**
 Esta função está a imprimir o estado em quatro colunas: uma para cada naipe
 @param path	o URL correspondente à pasta que contém todas as cartas
 @param ESTADO	O estado atual
 */
-void imprime(STATE e) {
+void imprime(STATE e, int mi) {
 	//int jv;
+	MAO jogada_Anterior=0;
+	int passa;
 	
 	printf("<svg height = \"900\" width = \"1050\">\n");
 	printf("<rect x = \"0\" y = \"0\" height = \"900\" width = \"1050\" style = \"fill:#007700\"/>\n"); 
+	if (mi!=3) {
+		jogada_Anterior = joga_fst_cartacpu(e,mi);
+		jogada_Anterior = joga_cartas_cpu(e,jogada_Anterior,0); 
+	}
 	if (e.acao==3) {
 		imprime_mao(500,390,e,e.selecao,4);
 		e.mao[3]=retira_cartas(e.mao[3],e.selecao);
-		joga_cartas_cpu(e,e.selecao);
+		jogada_Anterior = joga_cartas_cpu(e,e.selecao,0);
 		e.selecao=0;
+		e.acao=0;
+	}
+	if (e.acao==2) {
+		jogada_Anterior = joga_cartas_cpu(e,jogada_Anterior,passa+1);
 		e.acao=0;
 	}
 	imprime_mao(10,10,e,e.mao[0],0);
@@ -318,6 +354,7 @@ void imprime(STATE e) {
 	imprime_mao(10,250,e,e.mao[2],2);
 	imprime_mao(10,390,e,e.mao[3],3);
 
+	//incorporar no jogada_valida se o player for o 1º a jogar
 	//jv=jogada_valida(e);
 	imprime_butoes(40,510,e,1);
 
@@ -331,11 +368,15 @@ Caso não seja passado nada à cgi-bin, ela assume que todas as cartas estão pr
 @query A query que é passada à cgi-bin
  */
 void parse(STATE e) {
+	int i;
 
 	if(e.mao[0] == 0) {
 		e = distribuir(e);
 	}
-	imprime(e);
+	for (i=0;i<4;i++)
+		if (carta_existe(e.mao[i],0,0)) break;
+
+	imprime(e,(i-1));
 }
 
 /**
