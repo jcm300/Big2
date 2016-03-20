@@ -303,8 +303,6 @@ void joga_cartas_cpu (STATE e, int y) {
 			}
 		}
 	}
-	e.mao[e.ultimo_jogador]=retira_cartas(e.mao[e.ultimo_jogador],e.ultima_jogada);
-	e.tamanho[e.ultimo_jogador]=nroCartas(e.mao[e.ultimo_jogador]);
 }
 	
 void joga_fst_cpu (STATE e) {
@@ -316,8 +314,6 @@ void joga_fst_cpu (STATE e) {
 		}
 	}
 	e.ultimo_jogador=i-1;
-	e.mao[e.ultimo_jogador]=retira_cartas(e.mao[e.ultimo_jogador],e.ultima_jogada);
-	e.tamanho[e.ultimo_jogador]=nroCartas(e.mao[e.ultimo_jogador]);
 }
 /**
 Esta função está a imprimir o estado em quatro colunas: uma para cada naipe
@@ -326,31 +322,35 @@ Esta função está a imprimir o estado em quatro colunas: uma para cada naipe
 */
 void imprime(STATE e) {
 	//int jv;
-	int y;
 	
 	printf("<svg height = \"900\" width = \"1050\">\n");
 	printf("<rect x = \"0\" y = \"0\" height = \"900\" width = \"1050\" style = \"fill:#007700\"/>\n"); 
 	
 	if (e.tamanho[0]==13 && e.tamanho[1]==13 && e.tamanho[2]==13 && e.tamanho[3]==13) {
 		joga_fst_cpu(e);
+		e.mao[e.ultimo_jogador]=retira_cartas(e.mao[e.ultimo_jogador],e.ultima_jogada);
+		e.tamanho[e.ultimo_jogador]=nroCartas(e.mao[e.ultimo_jogador]);
 	}
 
 	if (e.ultimo_jogador==3) {
-		y=10;
 		e.ultimo_jogador=0;
-		joga_cartas_cpu(e,y);
+		joga_cartas_cpu(e,10);
+		e.mao[e.ultimo_jogador]=retira_cartas(e.mao[e.ultimo_jogador],e.ultima_jogada);
+		e.tamanho[e.ultimo_jogador]=nroCartas(e.mao[e.ultimo_jogador]);
 	}
 
 	if (e.ultimo_jogador==0) {
-		y=130;
 		e.ultimo_jogador=1;
-		joga_cartas_cpu(e,y);
+		joga_cartas_cpu(e,130);
+		e.mao[e.ultimo_jogador]=retira_cartas(e.mao[e.ultimo_jogador],e.ultima_jogada);
+		e.tamanho[e.ultimo_jogador]=nroCartas(e.mao[e.ultimo_jogador]);
 	}
 
 	if (e.ultimo_jogador==1) {
-		y=250;
 		e.ultimo_jogador=2;
-		joga_cartas_cpu(e,y);
+		joga_cartas_cpu(e,250);
+		e.mao[e.ultimo_jogador]=retira_cartas(e.mao[e.ultimo_jogador],e.ultima_jogada);
+		e.tamanho[e.ultimo_jogador]=nroCartas(e.mao[e.ultimo_jogador]);
 	}
 
 	if (e.ultimo_jogador==2) {
