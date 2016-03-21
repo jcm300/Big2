@@ -189,8 +189,8 @@ void imprime_mao(int x, int y, STATE e, MAO mao, int m) {
 				if(carta_existe(mao, n, v)) {
 					x += 30;
 					if(carta_existe(e.selecao, n , v))	
-                        			imprime_carta(x, (y-20), e, n, v);
-                    			else imprime_carta(x, y, e, n, v);
+                        imprime_carta(x, (y-20), e, n, v);
+                    else imprime_carta(x, y, e, n, v);
 				}
 			} else {
 				if(carta_existe(mao, n, v)) {
@@ -274,7 +274,7 @@ MAO retira_cartas (MAO mao, MAO s) {
 	return mao;
 }
 
-void joga_cartas_cpu (STATE e, int y) {
+STATE joga_cartas_cpu (STATE e, int y) {
 	int n,v;
 	int x=500;
 	MAO temp=0x000000000000;
@@ -282,38 +282,64 @@ void joga_cartas_cpu (STATE e, int y) {
 		for(n = 0; n < 4; n++){
 			if(carta_existe(e.mao[e.ultimo_jogador], n, v) ) {
 				temp=add_carta(temp, n, v);
-				if (e.passar==3) {
+				if (e.passar>=3) {
 					x += 40;
 					imprime_carta(x,y,e,n,v);
-					v = 13;
-					n = 4;
 					e.ultima_jogada=temp;
 					e.passar=0;
+					return e;
 				} else {
 					if(comparaValores(e.ultima_jogada, temp)){
 						x += 40;
 						imprime_carta(x,y,e,n,v);
-						v = 13;
-						n = 4;
 						e.ultima_jogada=temp;
-					} else {
-						e.passar++;
+						e.passar=0;
+						return e;
 					}
 				}
+				temp=0x000000000000;
 			}
 		}
 	}
+	if(v==13 && n==4) e.passar++;
+	return e;
 }
 	
-void joga_fst_cpu (STATE e) {
+STATE joga_fst_cpu (STATE e) {
 	int y,i;
 	for (y=10, i=0; i<3; i++, y+=120) {
 		if (carta_existe(e.mao[i],0,0)) {
 			imprime_carta(540,y,e,0,0);
 			e.ultima_jogada=add_carta(e.ultima_jogada,0,0);
+			break;
 		}
 	}
-	e.ultimo_jogador=i-1;
+	e.ultimo_jogador=i;
+	return e;
+}
+
+STATE joga_cpu (STATE e) {
+	if (e.ultimo_jogador==3) {
+		e.ultimo_jogador=0;
+		e=joga_cartas_cpu(e,10);
+		e.mao[0]=retira_cartas(e.mao[0],e.ultima_jogada);
+		e.tamanho[0]=nroCartas(e.mao[0]);
+	}
+
+	if (e.ultimo_jogador==0) {
+		e.ultimo_jogador=1;
+		e=joga_cartas_cpu(e,130);
+		e.mao[1]=retira_cartas(e.mao[1],e.ultima_jogada);
+		e.tamanho[1]=nroCartas(e.mao[1]);
+	}
+
+	if (e.ultimo_jogador==1) {
+		e.ultimo_jogador=2;
+		e=joga_cartas_cpu(e,250);
+		e.mao[2]=retira_cartas(e.mao[2],e.ultima_jogada);
+		e.tamanho[2]=nroCartas(e.mao[2]);
+	}
+	return e;
 }
 /**
 Esta função está a imprimir o estado em quatro colunas: uma para cada naipe
@@ -327,33 +353,12 @@ void imprime(STATE e) {
 	printf("<rect x = \"0\" y = \"0\" height = \"900\" width = \"1050\" style = \"fill:#007700\"/>\n"); 
 	
 	if (e.tamanho[0]==13 && e.tamanho[1]==13 && e.tamanho[2]==13 && e.tamanho[3]==13) {
-		joga_fst_cpu(e);
+		e=joga_fst_cpu(e);
 		e.mao[e.ultimo_jogador]=retira_cartas(e.mao[e.ultimo_jogador],e.ultima_jogada);
 		e.tamanho[e.ultimo_jogador]=nroCartas(e.mao[e.ultimo_jogador]);
+		e=joga_cpu(e);
 	}
 
-	if (e.ultimo_jogador==3) {
-		e.ultimo_jogador=0;
-		joga_cartas_cpu(e,10);
-		e.mao[e.ultimo_jogador]=retira_cartas(e.mao[e.ultimo_jogador],e.ultima_jogada);
-		e.tamanho[e.ultimo_jogador]=nroCartas(e.mao[e.ultimo_jogador]);
-	}
-
-	if (e.ultimo_jogador==0) {
-		e.ultimo_jogador=1;
-		joga_cartas_cpu(e,130);
-		e.mao[e.ultimo_jogador]=retira_cartas(e.mao[e.ultimo_jogador],e.ultima_jogada);
-		e.tamanho[e.ultimo_jogador]=nroCartas(e.mao[e.ultimo_jogador]);
-	}
-
-	if (e.ultimo_jogador==1) {
-		e.ultimo_jogador=2;
-		joga_cartas_cpu(e,250);
-		e.mao[e.ultimo_jogador]=retira_cartas(e.mao[e.ultimo_jogador],e.ultima_jogada);
-		e.tamanho[e.ultimo_jogador]=nroCartas(e.mao[e.ultimo_jogador]);
-	}
-
-	if (e.ultimo_jogador==2) {
 		if (e.acao==3) {
 			imprime_mao(500,390,e,e.selecao,4);
 			e.ultima_jogada=e.selecao;
@@ -362,12 +367,14 @@ void imprime(STATE e) {
 			e.ultimo_jogador=3;
 			e.selecao=0;
 			e.acao=0;
+			e=joga_cpu(e);
 		}
 		if (e.acao==2) {
 			e.passar++;
+			e.ultimo_jogador=3;
 			e.acao=0;
+			e=joga_cpu(e);
 		}
-	}
 
 	imprime_mao(10,10,e,e.mao[0],0);
 	imprime_mao(10,130,e,e.mao[1],1);
