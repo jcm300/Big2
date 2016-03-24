@@ -1,2 +1,1 @@
-Adicionar botoes
-Revelar seleção
+Validar jogadas do player

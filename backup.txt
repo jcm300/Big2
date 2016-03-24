@@ -1,0 +1,31 @@
+	int n,v;
+	int x=500;
+	int z = nroCartas(e.ultima_jogada);
+	MAO temp=0x000000000000;
+	for(z; z > 0; z --)
+		for(v = 0; v < 13; v++){
+			for(n = 0; n < 4; n++){
+				if(carta_existe(e.mao[e.ultimo_jogador], n, v) ) {
+					temp=add_carta(temp, n, v);
+					if (e.passar>=3) {
+						x += 40;
+						imprime_carta(x,y,e,n,v);
+						e.ultima_jogada=temp;
+						e.passar=0;
+						return e;
+					} else {
+						if(comparaValores(e.ultima_jogada, temp)){
+							x += 40;
+							imprime_carta(x,y,e,n,v);
+							e.ultima_jogada=temp;
+							e.passar=0;
+							return e;
+						}
+					}
+					temp=0x000000000000;
+				}
+			}
+		}
+	e.passar++;
+	return e;
+
