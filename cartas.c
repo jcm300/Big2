@@ -418,7 +418,6 @@ void imprime(STATE e) {
 		}
 	}
 	
-	
 
 	if (e.acao==3) {
 		imprime_mao(500,390,e,e.selecao,4);
@@ -428,6 +427,7 @@ void imprime(STATE e) {
 		e.ultimo_jogador=3;
 		e.selecao=0;
 		e.acao=0;
+		e.passar=0;
 		e=joga_cpu(e);
 	}
 	if (e.acao==2) {
