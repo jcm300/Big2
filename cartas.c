@@ -214,7 +214,7 @@ void imprime_butoes(int x, int y, STATE e, int jv){
 		sprintf(script, "%s?%s", SCRIPT, estado2str(e));
 		printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/Jogar_enabled.png\" /></a>\n", script, x+200, y, BARALHO);
 	} else {
-		printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/Jogar_disabled.png\" /></a>\n", script, x+200, y, BARALHO);
+		printf("<image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/Jogar_disabled.png\" />\n", x+200, y, BARALHO);
 	}
 }
 
@@ -249,7 +249,7 @@ int comparaMaos(MAO jogadaAnt, MAO jogadaAtual){
 }
 
 int cartasDiferentes(MAO jogadaAtual){
-	int c = 0;	
+	int c = 0, ct = c + 1;	
 
 	while(jogadaAtual % 2 != 1 && jogadaAtual > 0){
 		if(c > 12)
@@ -259,7 +259,7 @@ int cartasDiferentes(MAO jogadaAtual){
 	} 
 
 	jogadaAtual /= 2;
-	int ct = c + 1;
+
 	while(jogadaAtual > 0){
 		if(ct > 12)
 			ct = 0;
@@ -274,11 +274,12 @@ int cartasDiferentes(MAO jogadaAtual){
 
 
 
-int jogadaValida(MAO jogadaAnt, MAO jogadaAtual, int Player){
+int jogadaValida(MAO jogadaAnt, MAO jogadaAtual, int passar){
 
 	int nroAg, nroAnt;
 	nroAnt = nroCartas(jogadaAnt);
 	nroAg = nroCartas(jogadaAtual);
+	if (passar>=3 && nroAg != 0) return 1;
 	if(!(cartasDiferentes(jogadaAtual))) return 0;	
 	else if(nroAnt == 0) return 1;
 	else if(nroAnt != nroAg) return 0;
@@ -319,20 +320,19 @@ STATE joga_cartas_cpu (STATE e, int y) {
 					return e;
 				}
 				else if(comparaMaos(e.ultima_jogada, temp)){
-					nt = 0;
-					while(nroCartas(temp) < nro && nt < 4){
+					 nt = 0;
+					 while(nroCartas(temp) < nro && nt < 4){
 						if(carta_existe(e.mao[e.ultimo_jogador], nt, v) && nt != n)
 							temp = add_carta(temp, nt, v);
-						nt ++;	
-								
-					}
-					if(nroCartas(temp) == nro){
+						nt ++;			
+					 }
+					 if(nroCartas(temp) == nro){
 						imprime_mao(x, y, e, temp, 4);
 						e.ultima_jogada= temp;
 						e.passar = 0;
 						return e;	
+					 }
 					}
-				}
 			}
 		}
 	}
@@ -354,6 +354,8 @@ STATE joga_fst_cpu (STATE e) {
 		}
 	}
 	e.ultimo_jogador=i;
+	e.mao[e.ultimo_jogador]=retira_cartas(e.mao[e.ultimo_jogador],e.ultima_jogada);
+	e.tamanho[e.ultimo_jogador]=nroCartas(e.mao[e.ultimo_jogador]);
 	return e;
 }
 
@@ -386,11 +388,10 @@ Esta função está a imprimir o estado em quatro colunas: uma para cada naipe
 @param ESTADO	O estado atual
 */
 void imprime(STATE e) {
-	int jv;
+	int jv,i;
 	
 	if (e.tamanho[0]==0 || e.tamanho[1]==0 || e.tamanho[2]==0 || e.tamanho[3]==0) {
 		e.acao = 0;
-		int i;
 		printf("<h1>Jogador Pontuação </h1>\n");
 		for(i = 0; i < 4; i ++){
 			if(e.tamanho[i] <= 9 && e.tamanho[i] > 0)
@@ -411,11 +412,7 @@ void imprime(STATE e) {
 		if(e.ultimo_jogador == 3){
 			e.selecao = add_carta(e.selecao, 0, 0);
 		}
-		else{
-			e.mao[e.ultimo_jogador]=retira_cartas(e.mao[e.ultimo_jogador],e.ultima_jogada);
-			e.tamanho[e.ultimo_jogador]=nroCartas(e.mao[e.ultimo_jogador]);
-			e=joga_cpu(e);
-		}
+		else e=joga_cpu(e);
 	}
 	
 
@@ -431,7 +428,7 @@ void imprime(STATE e) {
 		e=joga_cpu(e);
 	}
 	if (e.acao==2) {
-		e.passar++;
+		e.passar=e.passar+1;
 		e.ultimo_jogador=3;
 		e.acao=0;
 		e=joga_cpu(e);
@@ -442,7 +439,7 @@ void imprime(STATE e) {
 	imprime_mao(10,250,e,e.mao[2],2);
 	imprime_mao(10,390,e,e.mao[3],3);
 
-	jv=jogadaValida(e.ultima_jogada, e.selecao,1);
+	jv=jogadaValida(e.ultima_jogada, e.selecao,e.passar);
 	imprime_butoes(40,510,e,jv);
 
 	printf("</svg>\n");
