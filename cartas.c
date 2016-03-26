@@ -9,20 +9,25 @@
 #define NAIPES		"DCHS"
 #define VALORES		"3456789TJQKA2"
 #define FORMATO 	"%lld_%lld_%lld_%lld_%d_%d_%d_%d_%lld_%d_%d_%d_%lld"
+/**
+Tipo MAO defenido para representar long long int
+*/
+typedef long long int MAO;
 
 /**
 Guarda o estado do jogo
 @param mao cada uma das 4 mãos
 @param tamanho o número de cartas em cada mão
 @param selecao Que cartas foram neste momento selecionadas pelo jogador
-@param acao se o jogador carregou em algum botão (e.g., jogar ou passar)
+@param acao se o jogador carregou em algum botão (e.g., jogar ou passar ou baralhar)
+@param passar numero de jogadores k passaram consecutivamente
+@param ultimo_jogador o ultimo jogador que jogou
+@param ultima_jogada a ultima jogada jogada
 */
-typedef long long int MAO;
-
 typedef struct {
-  	long long int mao[4];
+  	MAO mao[4];
   	int tamanho[4];
-  	long long int selecao;
+  	MAO selecao;
   	int acao, passar, ultimo_jogador;
   	MAO ultima_jogada;
 	} STATE;
@@ -37,16 +42,21 @@ int indice(int naipe, int valor) {
 	return naipe * 13 + valor;
 }
 
+/**
+Passa uma string para o estado STATE
+*/
 STATE str2estado (char* str) {
 	STATE e;
 	sscanf(str, FORMATO, &e.mao[0], &e.mao[1], &e.mao[2], &e.mao[3], &e.tamanho[0], &e.tamanho[1], &e.tamanho[2],&e.tamanho[3], &e.selecao, &e.acao, &e.passar, &e.ultimo_jogador, &e.ultima_jogada);
 	return e;
 }
 
+/**
+Passa o estado STATE para string 
+*/
 char* estado2str (STATE e){
 	static char res[10240];
-	sprintf(res, FORMATO, e.mao[0], e.mao[1], e.mao[2], e.mao[3], e.tamanho[0],e.tamanho[1],e.tamanho[2],e.tamanho[3], e.selecao, e.acao, e.passar, e.ultimo_jogador
-, e.ultima_jogada);
+	sprintf(res, FORMATO, e.mao[0], e.mao[1], e.mao[2], e.mao[3], e.tamanho[0],e.tamanho[1],e.tamanho[2],e.tamanho[3], e.selecao, e.acao, e.passar, e.ultimo_jogador, e.ultima_jogada);
 	return res;
 }
 
@@ -86,8 +96,10 @@ int carta_existe(long long int ESTADO, int naipe, int valor) {
 	return (ESTADO >> idx) & 1;
 }
 
+/**
+Numero de cartas presentes na mao
+*/
 int nroCartas(MAO m){
-
 	int r = 0;
 
 	while(m > 0){
@@ -96,9 +108,6 @@ int nroCartas(MAO m){
 	}
 	return r;	
 }
-
-
-
 
 /**
 Funçao que distribui as cartas
@@ -150,10 +159,9 @@ STATE distribuir(STATE e) {
 
 /**
 Imprime o html correspondente a uma carta
-@param path	o URL correspondente à pasta que contém todas as cartas
 @param x A coordenada x da carta
 @param y A coordenada y da carta
-@param ESTADO	O estado atual
+@param STATE	O estado atual
 @param naipe	O naipe da carta (inteiro entre 0 e 3)
 @param valor	O valor da carta (inteiro entre 0 e 12)
 */
@@ -180,7 +188,9 @@ void imprime_Bcarta(char *path, int x, int y, STATE e, int i) {
 }
 */
 
-
+/**
+imprime uma mao consuante o x e o y
+*/
 void imprime_mao(int x, int y, STATE e, MAO mao, int m) {
 	int n, v;
 
@@ -201,6 +211,9 @@ void imprime_mao(int x, int y, STATE e, MAO mao, int m) {
     }	
 }
 
+/**
+imprime o html dos butoes baralhar, passar e jogar
+*/
 void imprime_butoes(int x, int y, STATE e, int jv){
 	char script[10240];	
 	e.acao=1;
@@ -218,6 +231,9 @@ void imprime_butoes(int x, int y, STATE e, int jv){
 	}
 }
 
+/**
+Compara duas maos e valida a jogadaAtual em relaçao a jogadaAnt
+*/
 int comparaMaos(MAO jogadaAnt, MAO jogadaAtual){
 	int c  = 0, v1 = 0, v2 = 0, n1 = 0, n2 = 0;
 
@@ -257,21 +273,16 @@ int cartasDiferentes(MAO jogadaAtual){
 		jogadaAtual /= 2;
 		c ++;
 	} 
-
 	jogadaAtual /= 2;
-
 	while(jogadaAtual > 0){
 		if(ct > 12)
-			ct = 0;
-		
+			ct = 0;		
 		if(jogadaAtual%2 == 1 && ct != c) return 0;
-		
 		jogadaAtual /=2;
 		ct ++;
 	}
 	return 1;
 }
-
 
 
 int jogadaValida(MAO jogadaAnt, MAO jogadaAtual, int passar){
@@ -300,6 +311,9 @@ MAO retira_cartas (MAO mao, MAO s) {
 	return mao;
 }
 
+/**
+Joga uma jogada consoante a mao e a ultima_jogada
+*/
 STATE joga_cartas_cpu (STATE e, int y) {
 	int n, v;
 	int x = 500;
@@ -313,7 +327,6 @@ STATE joga_cartas_cpu (STATE e, int y) {
 			if(carta_existe(e.mao[e.ultimo_jogador], n, v)){
 				temp = add_carta(temp, n, v);
 				if(e.passar >= 3){
-					x += 40;
 					imprime_mao(x,y,e,temp,v);
 					e.ultima_jogada = temp;	
 					e.passar = 0;
@@ -343,12 +356,14 @@ STATE joga_cartas_cpu (STATE e, int y) {
 	return e;
 }
 
-	
+/**
+Se os cpus tiverem o 3 de ouros esta funçao joga o 3 de ouros
+*/	
 STATE joga_fst_cpu (STATE e) {
 	int y,i;
 	for (y=10, i=0; i<3; i++, y+=120) {
 		if (carta_existe(e.mao[i],0,0)) {
-			imprime_carta(540,y,e,0,0);
+			imprime_carta(500,y,e,0,0);
 			e.ultima_jogada=add_carta(e.ultima_jogada,0,0);
 			break;
 		}
@@ -359,6 +374,9 @@ STATE joga_fst_cpu (STATE e) {
 	return e;
 }
 
+/**
+Faz os cpus jogar
+*/
 STATE joga_cpu (STATE e) {
 	if (e.ultimo_jogador==3) {
 		e.ultimo_jogador=0;
@@ -383,9 +401,8 @@ STATE joga_cpu (STATE e) {
 	return e;
 }
 /**
-Esta função está a imprimir o estado em quatro colunas: uma para cada naipe
-@param path	o URL correspondente à pasta que contém todas as cartas
-@param ESTADO	O estado atual
+Esta função está 
+@param STATE	O estado atual
 */
 void imprime(STATE e) {
 	int jv,i;
@@ -445,11 +462,7 @@ void imprime(STATE e) {
 	printf("</svg>\n");
 }
 /**
-Esta função recebe a query que é passada à cgi-bin e trata-a.
-Neste momento, a query contém o estado que é um inteiro que representa um conjunto de cartas.
-Cada carta corresponde a um bit que está a 1 se essa carta está no conjunto e a 0 caso contrário.
-Caso não seja passado nada à cgi-bin, ela assume que todas as cartas estão presentes.
-@query A query que é passada à cgi-bin
+Esta função se nao tiverem sido distribuido as cartas ela distribui e chama a funçao para que faz o jogo "correr"
  */
 void parse(STATE e) {
 
@@ -462,7 +475,7 @@ void parse(STATE e) {
 
 /**
 Função principal do programa que imprime os cabeçalhos necessários e depois disso invoca
-a função que vai imprimir o código html para desenhar as cartas
+a função que vai "gerir" o jogo
  */
 int main() {
 
@@ -495,9 +508,6 @@ int main() {
 	}
 
 	parse(e);
-		
-/* * Ler os valores passados à cgi que estão na variável ambiente e passá-los ao programa
- */
 
 	printf("</body>\n");
 	return 0;
