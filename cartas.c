@@ -16,13 +16,13 @@ typedef long long int MAO;
 
 /**
 Guarda o estado do jogo
-@param mao cada uma das 4 mãos
+@param mão cada uma das 4 mãos
 @param tamanho o número de cartas em cada mão
-@param selecao Que cartas foram neste momento selecionadas pelo jogador
+@param selecao cartas selecionadas pelo jogador
 @param acao se o jogador carregou em algum botão (e.g., jogar ou passar ou baralhar)
-@param passar numero de jogadores k passaram consecutivamente
-@param ultimo_jogador o ultimo jogador que jogou
-@param ultima_jogada a ultima jogada jogada
+@param passar número de jogadores que passaram consecutivamente
+@param ultimo_jogador o último jogador que jogou
+@param ultima_jogada a última jogada jogada
 */
 typedef struct {
   	MAO mao[4];
@@ -97,7 +97,7 @@ int carta_existe(long long int ESTADO, int naipe, int valor) {
 }
 
 /**
-Numero de cartas presentes na mao
+Número de cartas presentes na mão
 */
 int nroCartas(MAO m){
 	int r = 0;
@@ -110,7 +110,7 @@ int nroCartas(MAO m){
 }
 
 /**
-Funçao que distribui as cartas
+Função que distribui as cartas
 */
 STATE distribuir(STATE e) {
 	/**
@@ -189,7 +189,7 @@ void imprime_Bcarta(char *path, int x, int y, STATE e, int i) {
 */
 
 /**
-imprime uma mao consuante o x e o y
+Imprime uma mão consoante o x e o y
 */
 void imprime_mao(int x, int y, STATE e, MAO mao, int m) {
 	int n, v;
@@ -212,7 +212,7 @@ void imprime_mao(int x, int y, STATE e, MAO mao, int m) {
 }
 
 /**
-imprime o html dos butoes baralhar, passar e jogar
+Imprime os butões baralhar, passar e jogar
 */
 void imprime_butoes(int x, int y, STATE e, int jv){
 	char script[10240];	
@@ -232,7 +232,7 @@ void imprime_butoes(int x, int y, STATE e, int jv){
 }
 
 /**
-Compara duas maos e valida a jogadaAtual em relaçao a jogadaAnt
+Compara duas mãos por forma a validar a jogadaAtual em relação a jogadaAnt
 */
 int comparaMaos(MAO jogadaAnt, MAO jogadaAtual){
 	int c  = 0, v1 = 0, v2 = 0, n1 = 0, n2 = 0;
@@ -264,6 +264,7 @@ int comparaMaos(MAO jogadaAnt, MAO jogadaAtual){
 	else return (v1<v2);
 }
 
+/**Verifica se as cartas selecionadas pelo jogador são do mesmo valor*/
 int cartasDiferentes(MAO jogadaAtual){
 	int c = 0, ct = c + 1;	
 
@@ -284,7 +285,7 @@ int cartasDiferentes(MAO jogadaAtual){
 	return 1;
 }
 
-
+/**Função encarregue de verificar a validade da seleção do jogador*/
 int jogadaValida(MAO jogadaAnt, MAO jogadaAtual, int passar){
 
 	int nroAg, nroAnt;
@@ -299,7 +300,7 @@ int jogadaValida(MAO jogadaAnt, MAO jogadaAtual, int passar){
 }
 
 
-/** Funçao que retira as cartas de uma mao caso ja esteja presente na seleçao*/
+/** Função que retira as cartas de uma mão caso já esteja presente na seleção*/
 MAO retira_cartas (MAO mao, MAO s) {
 	int n,v;
 	for(v = 0; v < 13; v++) {
@@ -312,7 +313,7 @@ MAO retira_cartas (MAO mao, MAO s) {
 }
 
 /**
-Joga uma jogada consoante a mao e a ultima_jogada
+Realiza uma jogada tendo em conta a mão e a ultima_jogada
 */
 STATE joga_cartas_cpu (STATE e, int y) {
 	int n, v;
@@ -357,7 +358,7 @@ STATE joga_cartas_cpu (STATE e, int y) {
 }
 
 /**
-Se os cpus tiverem o 3 de ouros esta funçao joga o 3 de ouros
+Se os cpus tiverem o 3 de ouros esta função joga o 3 de ouros
 */	
 STATE joga_fst_cpu (STATE e) {
 	int y,i;
@@ -375,7 +376,7 @@ STATE joga_fst_cpu (STATE e) {
 }
 
 /**
-Faz os cpus jogar
+Função encarrege de fazer os cpus jogar
 */
 STATE joga_cpu (STATE e) {
 	if (e.ultimo_jogador==3) {
@@ -401,7 +402,7 @@ STATE joga_cpu (STATE e) {
 	return e;
 }
 /**
-Esta função está 
+Esta função está encarregue de imprimir o estado do jogo tendo em conta certos aspetos do mesmo. 
 @param STATE	O estado atual
 */
 void imprime(STATE e) {
@@ -462,7 +463,7 @@ void imprime(STATE e) {
 	printf("</svg>\n");
 }
 /**
-Esta função se nao tiverem sido distribuido as cartas ela distribui e chama a funçao para que faz o jogo "correr"
+Função encarregue de distribuir as cartas, caso estas não tenham sido já distribuídas, e de chamar a funçao que faz o jogo "correr"
  */
 void parse(STATE e) {
 
