@@ -314,7 +314,7 @@ STATE joga_cartas_cpu (STATE e, int y) {
 				temp = add_carta(temp, n, v);
 				if(e.passar >= 3){
 					x += 40;
-					imprime_mao(x,y,e,n,v);
+					imprime_mao(x,y,e,temp,v);
 					e.ultima_jogada = temp;	
 					e.passar = 0;
 					return e;
@@ -332,7 +332,7 @@ STATE joga_cartas_cpu (STATE e, int y) {
 						e.passar = 0;
 						return e;	
 					 }
-					}
+				}
 			}
 		}
 	}
