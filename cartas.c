@@ -180,13 +180,13 @@ void imprime_carta(int x, int y, STATE e, int naipe, int valor) {
 	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", script, x, y, BARALHO, rank[valor], suit[naipe]);
 }
 
-/*
-void imprime_Bcarta(char *path, int x, int y, STATE e, int i) {
+/** Imprime o html correspondente a uma carta de "costas" */
+void imprime_carta_costas(int x, int y, STATE e) {
 	char script[10240];
 	sprintf(script, "%s?%s", SCRIPT, estado2str(e));
-	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", script, x, y, path, 'c', 'B'); 
+	printf("<image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.jpg\" />\n", x, y, BARALHO, 'c', 'B'); 
 }
-*/
+
 
 /**
 Imprime uma mão consoante o x e o y
@@ -209,6 +209,18 @@ void imprime_mao(int x, int y, STATE e, MAO mao, int m) {
 				}	
 			}
     }	
+}
+
+/**
+Imprime uma mão de "costas" consoante o x e o y
+*/
+void imprime_mao_costas(int x, int y, STATE e, MAO mao) {
+	int n, i;
+	n = nroCartas(mao);
+	for(i = 0; i < n; i++) {
+		x += 30;
+		imprime_carta_costas(x, y, e);
+	}		
 }
 
 /**
@@ -364,7 +376,7 @@ STATE joga_fst_cpu (STATE e) {
 	int y,i;
 	for (y=10, i=0; i<3; i++, y+=120) {
 		if (carta_existe(e.mao[i],0,0)) {
-			imprime_carta(500,y,e,0,0);
+			imprime_carta(530,y,e,0,0);
 			e.ultima_jogada=add_carta(e.ultima_jogada,0,0);
 			break;
 		}
@@ -452,9 +464,9 @@ void imprime(STATE e) {
 		e=joga_cpu(e);
 	}
 
-	imprime_mao(10,10,e,e.mao[0],0);
-	imprime_mao(10,130,e,e.mao[1],1);
-	imprime_mao(10,250,e,e.mao[2],2);
+	imprime_mao_costas(10,10,e,e.mao[0]);
+	imprime_mao_costas(10,130,e,e.mao[1]);
+	imprime_mao_costas(10,250,e,e.mao[2]);
 	imprime_mao(10,390,e,e.mao[3],3);
 
 	jv=jogadaValida(e.ultima_jogada, e.selecao,e.passar);
