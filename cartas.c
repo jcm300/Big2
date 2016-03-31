@@ -303,12 +303,15 @@ int jogadaValida(MAO jogadaAnt, MAO jogadaAtual, int passar){
 	int nroAg, nroAnt;
 	nroAnt = nroCartas(jogadaAnt);
 	nroAg = nroCartas(jogadaAtual);
-	if(!(cartasDiferentes(jogadaAtual))) return 0;	
-	else if(nroAnt != nroAg) return 0;
-	else if(comparaMaos(jogadaAnt, jogadaAtual)) return 1;
-	else if(passar>=3) return 1;
-	else if(nroAnt == 0) return 1;
-	else return 0;
+	if(passar>=3) {
+		if(!(cartasDiferentes(jogadaAtual))) return 0;
+		else return 1;
+	} else {
+		if(!(cartasDiferentes(jogadaAtual))) return 0;	
+		else if(nroAnt != nroAg) return 0;
+		else if(comparaMaos(jogadaAnt, jogadaAtual)) return 1;
+	}
+	return 0;
 }
 
 
@@ -365,8 +368,6 @@ void joga_cartas_cpu (STATE * e, int y) {
 
 	if (n==4 && v==13) {
 		e->passar ++;
-		if(e->passar>=3)
-			e->ultima_jogada = 0;
 	}
 }
 
