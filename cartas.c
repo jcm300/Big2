@@ -303,6 +303,8 @@ int jogadaValida(MAO jogadaAnt, MAO jogadaAtual, int passar){
 	int nroAg, nroAnt;
 	nroAnt = nroCartas(jogadaAnt);
 	nroAg = nroCartas(jogadaAtual);
+	if(nroAnt == 0)
+		return 1;
 	if(passar>=3) {
 		if(!(cartasDiferentes(jogadaAtual))) return 0;
 		else return 1;
