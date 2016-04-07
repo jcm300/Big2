@@ -1,4 +1,4 @@
-CFLAGS = -Wall -Wextra -pedantic -Wno-long-long -g
+CFLAGS = -Wall -Wextra -pedantic -Wno-long-long -O2
 OBJS = $(patsubst %.c,%.o,$(wildcard *.c))
 EXEC = cartas
 $(EXEC):$(OBJS)
