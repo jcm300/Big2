@@ -358,14 +358,10 @@ int jogadaValida(MAO jogadaAnt, MAO jogadaAtual, int passar){
 
 	int nroAg, nroAnt;
 	nroAnt = nroCartas(jogadaAnt);
+	if(passar >= 3) nroAnt = 0;
 	nroAg = nroCartas(jogadaAtual);
 	if(nroAg <= 0) return 0;
-	else if(passar >= 3){
-		if(!(cartasDiferentes(jogadaAtual))) return 0;	
-		else if(nroAg > 3) return 0;
-		else return 1;
-	}
-	if(!(cartasDiferentes(jogadaAtual))) return 0;	
+	else if(!(cartasDiferentes(jogadaAtual))) return 0;	
 	else if(nroAnt == 0) return 1;
 	else if(nroAnt != nroAg) return 0;
 	else if(comparaMaos(jogadaAnt, jogadaAtual)) return 1;
