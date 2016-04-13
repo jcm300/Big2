@@ -5,6 +5,7 @@
 
 #define SCRIPT		"http://127.0.0.1/cgi-bin/cartas"
 #define BARALHO		"http://127.0.0.1/cards"
+#define BOTOES		"http://127.0.0.1/botoes"
 
 #define NAIPES		"DCHS"
 #define VALORES		"3456789TJQKA2"
@@ -126,7 +127,7 @@ void distribuir(STATE* e) {
 		if (carta_existe(ESTADO,x,y)) {
 			e->mao[0] = add_carta(e->mao[0],x,y);
 			ESTADO = rem_carta(ESTADO,x,y);
-			n ++;
+			n++;
 			e->tamanho[0] += 1;
 		}
 	}
@@ -249,23 +250,23 @@ void imprime_butoes(int x, int y, STATE e, int jv){
 	char script[10240];	
 	e.acao=1;
 	sprintf(script, "%s?%s", SCRIPT, estado2str(e));
-	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/baralhar.png\" /></a>\n", script, x, y, BARALHO);
+	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/baralhar.png\" /></a>\n", script, x, y, BOTOES);
 	e.acao=2;
 	sprintf(script, "%s?%s", SCRIPT, estado2str(e));
-	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/Passa.png\" /></a>\n", script, x+100, y, BARALHO);
+	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/Passa.png\" /></a>\n", script, x+100, y, BOTOES);
 	e.acao = 4;
 	sprintf(script, "%s?%s", SCRIPT, estado2str(e));
-	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"150\" width = \"100\" xlink:href = \"%s/ordenar.jpg\" /></a>\n", script, x + 400, y, BARALHO);
+	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/Sugestao.png\" /></a>\n", script, x+400, y, BOTOES);
 	e.acao=3;
 	if (jv) {
 		sprintf(script, "%s?%s", SCRIPT, estado2str(e));
-		printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/Jogar_enabled.png\" /></a>\n", script, x+200, y, BARALHO);
+		printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/Jogar_enabled.png\" /></a>\n", script, x+200, y, BOTOES);
 	} else {
-		printf("<image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/Jogar_disabled.png\" />\n", x+200, y, BARALHO);
+		printf("<image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/Jogar_disabled.png\" />\n", x+200, y, BOTOES);
 	}
 	e.ordem = !(e.ordem);
 	sprintf(script, "%s?%s", SCRIPT, estado2str(e));
-	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/ordenar.jpg\" /></a>\n", script, x + 300, y, BARALHO);
+	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/Ordenar.png\" /></a>\n", script, x + 300, y, BOTOES);
 }
 
 
@@ -295,7 +296,7 @@ void fim(STATE *e){
 	else printf("<p>Jogador  Winner</p>\n" );
 	e->acao=1;
 	sprintf(script, "%s?%s", SCRIPT, estado2str(*e));
-	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/baralhar.png\" /></a>\n", script, x, y, BARALHO);
+	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/baralhar.png\" /></a>\n", script, x, y, BOTOES);
 }
 
 /**
@@ -551,8 +552,8 @@ void imprime(STATE e) {
 	}
 
 	imprime_mao(10,10,e,e.mao[0], 0);
-	imprime_mao(10,130,e,e.mao[1], 1);
-	imprime_mao(10,250,e,e.mao[2], 2);
+	imprime_mao(10,130,e,e.mao[1],1);
+	imprime_mao(10,250,e,e.mao[2],2);
 	imprime_mao(10,390,e,e.mao[3],3);
 
 
