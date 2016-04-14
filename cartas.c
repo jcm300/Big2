@@ -399,7 +399,7 @@ STATE joga_cartas_cpu (STATE e, int y) {
 			if(carta_existe(e.mao[(e.ultimo_jogador)], n, v)){
 				temp = add_carta(temp, n, v);
 				if((e.passar) >= 3){
-					imprime_mao(x,y,*e,temp,4);
+					imprime_mao(x,y,e,temp,4);
 					(e.ultima_jogada) = temp;	
 					(e.passar) = 0;
 					break;
@@ -412,7 +412,7 @@ STATE joga_cartas_cpu (STATE e, int y) {
 						nt ++;			
 					 }
 					 if(nroCartas(temp) == nro){
-						imprime_mao(x, y, *e, temp, 4);
+						imprime_mao(x, y, e, temp, 4);
 						(e.ultima_jogada)= temp;
 						(e.passar) = 0;
 						break;	
@@ -425,6 +425,7 @@ STATE joga_cartas_cpu (STATE e, int y) {
 	if (n==4 && v==13) {
 		(e.passar) += 1;
 	}
+	return e;
 }
 
 /**
@@ -515,6 +516,7 @@ STATE joga_cpu (STATE e) {
 			e.ultimo_jogador = 4;
 		}
 	}
+	return e;
 }
 /**
 Esta função está encarregue de imprimir o estado do jogo tendo em conta certos aspetos do mesmo. 
@@ -537,7 +539,7 @@ void imprime(STATE *e) {
 			if(e->ultimo_jogador == 3){
 				e->selecao = add_carta(e->selecao, 0, 0);
 			}
-			else joga_cpu(e);
+			else *e = joga_cpu(*e);
 		}
 		
 		if(e->acao == 4){
@@ -554,13 +556,13 @@ void imprime(STATE *e) {
 			e->selecao=0;
 			e->acao=0;
 			e->passar=0;
-			e=joga_cpu(e);
+			*e=joga_cpu(*e);
 		}
 		else if (e->acao==2) {
 			(e->passar)++;
 			e->ultimo_jogador=3;
 			e->acao=0;
-			e=joga_cpu(e);
+			*e=joga_cpu(*e);
 		}
 
 		imprime_mao(10,10,*e,e->mao[0], 0);
