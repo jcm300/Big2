@@ -255,19 +255,20 @@ void imprime_butoes(int x, int y, STATE e, int jv){
 	e.acao=2;
 	sprintf(script, "%s?%s", SCRIPT, estado2str(e));
 	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/Passa.png\" /></a>\n", script, x+100, y, BOTOES);
+	e.acao = 4;
+	sprintf(script, "%s?%s", SCRIPT, estado2str(e));
+	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/Sugestao.png\" /></a>\n", script, x+300, y, BOTOES);
 	e.acao=3;
 	if (jv) {
 		sprintf(script, "%s?%s", SCRIPT, estado2str(e));
 		printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/Jogar_enabled.png\" /></a>\n", script, x+200, y, BOTOES);
 	} else {
+		sprintf(script, "%s?%s", SCRIPT, estado2str(e));
 		printf("<image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/Jogar_disabled.png\" />\n", x+200, y, BOTOES);
 	}
-	e.acao = 4;
-	sprintf(script, "%s?%s", SCRIPT, estado2str(e));
-	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/Sugestao.png\" /></a>\n", script, x+400, y, BOTOES);
 	e.ordem = !(e.ordem);
 	sprintf(script, "%s?%s", SCRIPT, estado2str(e));
-	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/Ordenar.png\" /></a>\n", script, x + 300, y, BOTOES);
+	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/Ordenar.png\" /></a>\n", script, x +400, y, BOTOES);
 }
 
 
@@ -399,13 +400,13 @@ STATE joga_cartas_cpu (STATE e, int y) {
 			temp = 0x0000000000000;
 			if(carta_existe(e.mao[(e.ultimo_jogador)], n, v)){
 				temp = add_carta(temp, n, v);
-				if((e.passar) >= 3){
+				if(e.passar >= 3 || nro == 0){
+					e.ultima_jogada = temp;	
+					e.passar = 0;
 					imprime_mao(x,y,e,temp,4);
-					(e.ultima_jogada) = temp;	
-					(e.passar) = 0;
-					break;
+					return e;
 				}
-				else if(comparaMaos(e.ultima_jogada, temp)){
+				if(comparaMaos(e.ultima_jogada, temp)){
 					 nt = 0;
 					 while(nroCartas(temp) < nro && nt < 4){
 						if(carta_existe(e.mao[(e.ultimo_jogador)], nt, v) && nt != n)
@@ -413,19 +414,17 @@ STATE joga_cartas_cpu (STATE e, int y) {
 						nt ++;			
 					 }
 					 if(nroCartas(temp) == nro){
+						e.passar = 0;
+						e.ultima_jogada= temp;
 						imprime_mao(x, y, e, temp, 4);
-						(e.ultima_jogada)= temp;
-						(e.passar) = 0;
-						break;	
+						return e;	
 					 }
 				}
 			}
 		}
 	}
 
-	if (n==4 && v==13) {
-		(e.passar) += 1;
-	}
+	e.passar += 1;
 	return e;
 }
 
@@ -445,7 +444,7 @@ void sugereJogada (STATE e) {
 			temp = 0x0000000000000;
 			if(carta_existe(e.mao[3], n, v)){
 				temp = add_carta(temp, n, v);
-				if(e.passar >= 3){
+				if(e.passar >= 3 || nro == 0){
 					imprime_mao(x,y,e,temp,v);
 					break;
 				}	
@@ -544,24 +543,24 @@ void imprime(STATE e) {
 			else e = joga_cpu(e);
 		}
 		
-/*		if(e.acao == 4){
+		if(e.acao == 4){
 			sugereJogada (e); 
 			e.acao = 0;
 		}
-*/	
+	
 		if (e.acao==3) {
-			imprime_mao(500,390,e,e.selecao,4);
 			e.ultima_jogada=e.selecao;
 			e.mao[3]=retira_cartas(e.mao[3],e.ultima_jogada);
 			e.tamanho[3]=nroCartas(e.mao[3]);
 			e.ultimo_jogador=3;
-			e.selecao=0;
-			e.acao=0;
 			e.passar=0;
+			e.acao=0;
+			imprime_mao(500,390,e,e.selecao,4);
+			e.selecao=0;
 			e=joga_cpu(e);
 		}
-		else if (e.acao==2) {
-			(e.passar)++;
+		if (e.acao==2) {
+			e.passar++;
 			e.ultimo_jogador=3;
 			e.acao=0;
 			e=joga_cpu(e);
