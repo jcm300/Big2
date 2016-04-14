@@ -254,9 +254,6 @@ void imprime_butoes(int x, int y, STATE e, int jv){
 	e.acao=2;
 	sprintf(script, "%s?%s", SCRIPT, estado2str(e));
 	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/Passa.png\" /></a>\n", script, x+100, y, BOTOES);
-	e.acao = 4;
-	sprintf(script, "%s?%s", SCRIPT, estado2str(e));
-	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/Sugestao.png\" /></a>\n", script, x+400, y, BOTOES);
 	e.acao=3;
 	if (jv) {
 		sprintf(script, "%s?%s", SCRIPT, estado2str(e));
@@ -264,6 +261,9 @@ void imprime_butoes(int x, int y, STATE e, int jv){
 	} else {
 		printf("<image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/Jogar_disabled.png\" />\n", x+200, y, BOTOES);
 	}
+	e.acao = 4;
+	sprintf(script, "%s?%s", SCRIPT, estado2str(e));
+	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/Sugestao.png\" /></a>\n", script, x+400, y, BOTOES);
 	e.ordem = !(e.ordem);
 	sprintf(script, "%s?%s", SCRIPT, estado2str(e));
 	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/Ordenar.png\" /></a>\n", script, x + 300, y, BOTOES);
@@ -359,10 +359,11 @@ int jogadaValida(MAO jogadaAnt, MAO jogadaAtual, int passar){
 
 	int nroAg, nroAnt;
 	nroAnt = nroCartas(jogadaAnt);
-	if(passar >= 3) nroAnt = 0;
 	nroAg = nroCartas(jogadaAtual);
-	if(nroAg <= 0) return 0;
+
+	if(nroAg <= 0 || nroAg >=4) return 0;
 	else if(!(cartasDiferentes(jogadaAtual))) return 0;	
+	else if(passar >=3) return 1;
 	else if(nroAnt == 0) return 1;
 	else if(nroAnt != nroAg) return 0;
 	else if(comparaMaos(jogadaAnt, jogadaAtual)) return 1;
@@ -385,7 +386,7 @@ MAO retira_cartas (MAO mao, MAO s) {
 /**
 Realiza uma jogada tendo em conta a mão e a ultima_jogada
 */
-void joga_cartas_cpu (STATE * e, int y) {
+void joga_cartas_cpu (STATE *e, int y) {
 	int n, v;
 	int x = 500;
 	int nro = nroCartas(e->ultima_jogada);
@@ -397,23 +398,23 @@ void joga_cartas_cpu (STATE * e, int y) {
 			temp = 0x0000000000000;
 			if(carta_existe(e->mao[e->ultimo_jogador], n, v)){
 				temp = add_carta(temp, n, v);
-				if(e->passar >= 3){
-					imprime_mao(x,y,*e,temp,v);
-					e->ultima_jogada = temp;	
-					e->passar = 0;
+				if((e->passar) >= 3){
+					imprime_mao(x,y,*e,temp,4);
+					(e->ultima_jogada) = temp;	
+					(e->passar) = 0;
 					break;
 				}
 				else if(comparaMaos(e->ultima_jogada, temp)){
 					 nt = 0;
 					 while(nroCartas(temp) < nro && nt < 4){
-						if(carta_existe(e->mao[e->ultimo_jogador], nt, v) && nt != n)
+						if(carta_existe(e->mao[(e->ultimo_jogador)], nt, v) && nt != n)
 							temp = add_carta(temp, nt, v);
 						nt ++;			
 					 }
 					 if(nroCartas(temp) == nro){
 						imprime_mao(x, y, *e, temp, 4);
-						e->ultima_jogada= temp;
-						e->passar = 0;
+						(e->ultima_jogada)= temp;
+						(e->passar) = 0;
 						break;	
 					 }
 				}
@@ -422,14 +423,14 @@ void joga_cartas_cpu (STATE * e, int y) {
 	}
 
 	if (n==4 && v==13) {
-		e->passar ++;
+		(e->passar) += 1;
 	}
 }
 
 /**
 Função encarregue de encontrar uma possível jogada para player
 */
-void sugereJogada (STATE * e) {
+void sugereJogada (STATE *e) {
 	int n, v;
 	int x = 10;
 	int y = 600;
@@ -467,7 +468,7 @@ void sugereJogada (STATE * e) {
 /**
 Se os cpus tiverem o 3 de ouros esta função joga o 3 de ouros
 */	
-void joga_fst_cpu (STATE * e) {
+void joga_fst_cpu (STATE *e) {
 	int y,i;
 	for (y=10, i=0; i<3; i++, y+=120) {
 		if (carta_existe(e->mao[i],0,0)) {
@@ -484,12 +485,15 @@ void joga_fst_cpu (STATE * e) {
 /**
 Função encarrege de fazer os cpus jogar
 */
-void joga_cpu (STATE * e) {
-	if (e->ultimo_jogador==3) {
+void joga_cpu (STATE *e) {
+	if(e->ultimo_jogador == 3){
 		e->ultimo_jogador=0;
 		joga_cartas_cpu(e,10);
 		e->mao[0]=retira_cartas(e->mao[0],e->ultima_jogada);
 		e->tamanho[0]=nroCartas(e->mao[0]);
+		if(e->tamanho[0] == 0){
+			e->ultimo_jogador = 4;
+		}
 	}
 
 	if (e->ultimo_jogador==0) {
@@ -497,6 +501,9 @@ void joga_cpu (STATE * e) {
 		joga_cartas_cpu(e,130);
 		e->mao[1]=retira_cartas(e->mao[1],e->ultima_jogada);
 		e->tamanho[1]=nroCartas(e->mao[1]);
+		if(e->tamanho[1] == 0){
+			e->ultimo_jogador = 4;
+		}
 	}
 
 	if (e->ultimo_jogador==1) {
@@ -504,71 +511,78 @@ void joga_cpu (STATE * e) {
 		joga_cartas_cpu(e,250);
 		e->mao[2]=retira_cartas(e->mao[2],e->ultima_jogada);
 		e->tamanho[2]=nroCartas(e->mao[2]);
+		if(e->tamanho[2] == 0){
+			e->ultimo_jogador = 4;
+		}
 	}
+
 }
 /**
 Esta função está encarregue de imprimir o estado do jogo tendo em conta certos aspetos do mesmo. 
 @param STATE	O estado atual
 */
-void imprime(STATE e) {
+void imprime(STATE *e) {
 	int jv;
 	
-	if (e.tamanho[0]==0 || e.tamanho[1]==0 || e.tamanho[2]==0 || e.tamanho[3]==0) {
-		e.acao = 0;
-		fim(&e);
+	if (e->tamanho[0]==0 || e->tamanho[1]==0 || e->tamanho[2]==0 || e->tamanho[3]==0) {
+		e->acao = 0;
+		fim(e);
+		return ;
 	}
-	printf("<svg height = \"900\" width = \"1050\">\n");
-	printf("<rect x = \"0\" y = \"0\" height = \"900\" width = \"1050\" style = \"fill:#007700\"/>\n"); 
-	
-	if (e.tamanho[0]==13 && e.tamanho[1]==13 && e.tamanho[2]==13 && e.tamanho[3]==13) {
-		joga_fst_cpu(&e);
-		if(e.ultimo_jogador == 3){
-			e.selecao = add_carta(e.selecao, 0, 0);
+	else{
+		printf("<svg height = \"900\" width = \"1050\">\n");
+		printf("<rect x = \"0\" y = \"0\" height = \"900\" width = \"1050\" style = \"fill:#007700\"/>\n"); 
+		
+		if (e->tamanho[0]==13 && e->tamanho[1]==13 && e->tamanho[2]==13 && e->tamanho[3]==13) {
+			joga_fst_cpu(e);
+			if(e->ultimo_jogador == 3){
+				e->selecao = add_carta(e->selecao, 0, 0);
+			}
+			else joga_cpu(e);
 		}
-		else joga_cpu(&e);
-	}
+		
+		if(e->acao == 4){
+			sugereJogada (e); 
+			e->acao = 0;
+		}
 	
-	if(e.acao == 4){
-		sugereJogada (&e); 
-		e.acao = 0;
+		if (e->acao==3) {
+			imprime_mao(500,390,*e,e->selecao,4);
+			e->ultima_jogada=e->selecao;
+			e->mao[3]=retira_cartas(e->mao[3],e->ultima_jogada);
+			e->tamanho[3]=nroCartas(e->mao[3]);
+			e->ultimo_jogador=3;
+			e->selecao=0;
+			e->acao=0;
+			e->passar=0;
+			joga_cpu(e);
+		}
+		else if (e->acao==2) {
+			e->passar++;
+			e->ultimo_jogador=3;
+			e->acao=0;
+			joga_cpu(e);
+		}
+
+		imprime_mao(10,10,*e,e->mao[0], 0);
+		imprime_mao(10,130,*e,e->mao[1],1);
+		imprime_mao(10,250,*e,e->mao[2],2);
+		imprime_mao(10,390,*e,e->mao[3],3);
+
+
+		jv=jogadaValida(e->ultima_jogada, e->selecao,e->passar);
+		imprime_butoes(40,510,*e,jv);
+
+		printf("</svg>\n");
 	}
-
-	if (e.acao==3) {
-		imprime_mao(500,390,e,e.selecao,4);
-		e.ultima_jogada=e.selecao;
-		e.mao[3]=retira_cartas(e.mao[3],e.ultima_jogada);
-		e.tamanho[3]=nroCartas(e.mao[3]);
-		e.ultimo_jogador=3;
-		e.selecao=0;
-		e.acao=0;
-		e.passar=0;
-		joga_cpu(&e);
-	}
-	if (e.acao==2) {
-		e.passar=e.passar+1;
-		e.ultimo_jogador=3;
-		e.acao=0;
-		joga_cpu(&e);
-	}
-
-	imprime_mao(10,10,e,e.mao[0], 0);
-	imprime_mao(10,130,e,e.mao[1],1);
-	imprime_mao(10,250,e,e.mao[2],2);
-	imprime_mao(10,390,e,e.mao[3],3);
-
-
-	jv=jogadaValida(e.ultima_jogada, e.selecao,e.passar);
-	imprime_butoes(40,510,e,jv);
-
-	printf("</svg>\n");
 }
 /**
 Função encarregue de distribuir as cartas, caso estas não tenham sido já distribuídas, e de chamar a funçao que faz o jogo "correr"
  */
-void parse(STATE e) {
+void parse(STATE *e) {
 
-	if(e.mao[0] == 0) {
-		distribuir(&e);
+	if(e->mao[0] == 0) {
+		distribuir(e);
 	}
 
 	imprime(e);
@@ -608,7 +622,7 @@ int main() {
 		e.selecao=e.ultima_jogada=0;
 	}
 
-	parse(e);
+	parse(&e);
 
 	printf("</body>\n");
 	return 0;
