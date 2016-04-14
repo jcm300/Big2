@@ -386,35 +386,35 @@ MAO retira_cartas (MAO mao, MAO s) {
 /**
 Realiza uma jogada tendo em conta a mão e a ultima_jogada
 */
-void joga_cartas_cpu (STATE *e, int y) {
+STATE joga_cartas_cpu (STATE e, int y) {
 	int n, v;
 	int x = 500;
-	int nro = nroCartas(e->ultima_jogada);
+	int nro = nroCartas(e.ultima_jogada);
 	int nt;
 	MAO temp;
 				
 	for(n = 0; n < 4; n ++){
 		for(v = 0; v < 13; v ++){
 			temp = 0x0000000000000;
-			if(carta_existe(e->mao[e->ultimo_jogador], n, v)){
+			if(carta_existe(e.mao[(e.ultimo_jogador)], n, v)){
 				temp = add_carta(temp, n, v);
-				if((e->passar) >= 3){
+				if((e.passar) >= 3){
 					imprime_mao(x,y,*e,temp,4);
-					(e->ultima_jogada) = temp;	
-					(e->passar) = 0;
+					(e.ultima_jogada) = temp;	
+					(e.passar) = 0;
 					break;
 				}
-				else if(comparaMaos(e->ultima_jogada, temp)){
+				else if(comparaMaos(e.ultima_jogada, temp)){
 					 nt = 0;
 					 while(nroCartas(temp) < nro && nt < 4){
-						if(carta_existe(e->mao[(e->ultimo_jogador)], nt, v) && nt != n)
+						if(carta_existe(e.mao[(e.ultimo_jogador)], nt, v) && nt != n)
 							temp = add_carta(temp, nt, v);
 						nt ++;			
 					 }
 					 if(nroCartas(temp) == nro){
 						imprime_mao(x, y, *e, temp, 4);
-						(e->ultima_jogada)= temp;
-						(e->passar) = 0;
+						(e.ultima_jogada)= temp;
+						(e.passar) = 0;
 						break;	
 					 }
 				}
@@ -423,7 +423,7 @@ void joga_cartas_cpu (STATE *e, int y) {
 	}
 
 	if (n==4 && v==13) {
-		(e->passar) += 1;
+		(e.passar) += 1;
 	}
 }
 
@@ -485,37 +485,36 @@ void joga_fst_cpu (STATE *e) {
 /**
 Função encarrege de fazer os cpus jogar
 */
-void joga_cpu (STATE *e) {
-	if(e->ultimo_jogador == 3){
-		e->ultimo_jogador=0;
-		joga_cartas_cpu(e,10);
-		e->mao[0]=retira_cartas(e->mao[0],e->ultima_jogada);
-		e->tamanho[0]=nroCartas(e->mao[0]);
-		if(e->tamanho[0] == 0){
-			e->ultimo_jogador = 4;
+STATE joga_cpu (STATE e) {
+	if(e.ultimo_jogador == 3){
+		e.ultimo_jogador=0;
+		e=joga_cartas_cpu(e,10);
+		e.mao[0]=retira_cartas(e.mao[0],e.ultima_jogada);
+		e.tamanho[0]=nroCartas(e.mao[0]);
+		if(e.tamanho[0] == 0){
+			e.ultimo_jogador = 4;
 		}
 	}
 
-	if (e->ultimo_jogador==0) {
-		e->ultimo_jogador=1;
-		joga_cartas_cpu(e,130);
-		e->mao[1]=retira_cartas(e->mao[1],e->ultima_jogada);
-		e->tamanho[1]=nroCartas(e->mao[1]);
-		if(e->tamanho[1] == 0){
-			e->ultimo_jogador = 4;
+	if (e.ultimo_jogador==0) {
+		e.ultimo_jogador=1;
+		e=joga_cartas_cpu(e,130);
+		e.mao[1]=retira_cartas(e.mao[1],e.ultima_jogada);
+		e.tamanho[1]=nroCartas(e.mao[1]);
+		if(e.tamanho[1] == 0){
+			e.ultimo_jogador = 4;
 		}
 	}
 
-	if (e->ultimo_jogador==1) {
-		e->ultimo_jogador=2;
-		joga_cartas_cpu(e,250);
-		e->mao[2]=retira_cartas(e->mao[2],e->ultima_jogada);
-		e->tamanho[2]=nroCartas(e->mao[2]);
-		if(e->tamanho[2] == 0){
-			e->ultimo_jogador = 4;
+	if (e.ultimo_jogador==1) {
+		e.ultimo_jogador=2;
+		e=joga_cartas_cpu(e,250);
+		e.mao[2]=retira_cartas(e.mao[2],e.ultima_jogada);
+		e.tamanho[2]=nroCartas(e.mao[2]);
+		if(e.tamanho[2] == 0){
+			e.ultimo_jogador = 4;
 		}
 	}
-
 }
 /**
 Esta função está encarregue de imprimir o estado do jogo tendo em conta certos aspetos do mesmo. 
@@ -555,13 +554,13 @@ void imprime(STATE *e) {
 			e->selecao=0;
 			e->acao=0;
 			e->passar=0;
-			joga_cpu(e);
+			e=joga_cpu(e);
 		}
 		else if (e->acao==2) {
-			e->passar++;
+			(e->passar)++;
 			e->ultimo_jogador=3;
 			e->acao=0;
-			joga_cpu(e);
+			e=joga_cpu(e);
 		}
 
 		imprime_mao(10,10,*e,e->mao[0], 0);
