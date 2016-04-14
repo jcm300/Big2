@@ -113,7 +113,7 @@ int nroCartas(MAO m){
 /**
 Função que distribui as cartas
 */
-void distribuir(STATE* e) {
+STATE distribuir(STATE e) {
 	/**
 	Estado com todas as 52 cartas do baralho
 	*/
@@ -125,10 +125,10 @@ void distribuir(STATE* e) {
 		x = random() % 4;
 		y = random() % 13;
 		if (carta_existe(ESTADO,x,y)) {
-			e->mao[0] = add_carta(e->mao[0],x,y);
+			e.mao[0] = add_carta(e.mao[0],x,y);
 			ESTADO = rem_carta(ESTADO,x,y);
 			n++;
-			e->tamanho[0] += 1;
+			e.tamanho[0] += 1;
 		}
 	}
 	n=0;
@@ -136,10 +136,10 @@ void distribuir(STATE* e) {
 		x = random() % 4;
 		y = random() % 13;
 		if (carta_existe(ESTADO,x,y)) {
-			e->mao[1] = add_carta(e->mao[1],x,y);
+			e.mao[1] = add_carta(e.mao[1],x,y);
 			ESTADO = rem_carta(ESTADO,x,y);
 			n++;
-			e->tamanho[1] += 1;
+			e.tamanho[1] += 1;
 		}
 	}
 	n=0;
@@ -147,14 +147,15 @@ void distribuir(STATE* e) {
 		x = random() % 4;
 		y = random() % 13;
 		if (carta_existe(ESTADO,x,y)) {
-		e->mao[2] = add_carta(e->mao[2],x,y);
+		e.mao[2] = add_carta(e.mao[2],x,y);
 		ESTADO = rem_carta(ESTADO,x,y);
 		n ++;
-		e->tamanho[2] += 1;
+		e.tamanho[2] += 1;
 		}
 	}
-	e->mao[3] = ESTADO;
-	e->tamanho[3] = 13;
+	e.mao[3] = ESTADO;
+	e.tamanho[3] = 13;
+	return e;
 }
 
 /**
@@ -270,7 +271,7 @@ void imprime_butoes(int x, int y, STATE e, int jv){
 }
 
 
-void fim(STATE *e){
+void fim(STATE e){
 
 	int x = 40;
 	int y =510;
@@ -279,23 +280,23 @@ void fim(STATE *e){
 
 	printf("<h1>Jogador Pontuação </h1>\n");
 	for(i = 0; i < 3; i ++){
-		if(e->tamanho[i] <= 9 && e->tamanho[i] > 0)
-			printf("<p>%d  %d\n</p>\n", i, -e->tamanho[i]);
-		else if(e->tamanho[i] >= 10 && e->tamanho[i] <= 12)
-			printf("<p>%d  %d\n</p>\n", i, (-2)* e->tamanho[i]);
-		else if(e->tamanho[i] == 13)
-		printf("<p>%d  %d\n</p>\n", i, (-3) * e->tamanho[i]);
+		if(e.tamanho[i] <= 9 && e.tamanho[i] > 0)
+			printf("<p>%d  %d\n</p>\n", i, -e.tamanho[i]);
+		else if(e.tamanho[i] >= 10 && e.tamanho[i] <= 12)
+			printf("<p>%d  %d\n</p>\n", i, (-2)* e.tamanho[i]);
+		else if(e.tamanho[i] == 13)
+		printf("<p>%d  %d\n</p>\n", i, (-3) * e.tamanho[i]);
 		else printf("<p>%d  Winner</p>\n", i);
 	}
-	if(e->tamanho[i] <= 9 && e->tamanho[i] > 0)
-		printf("<p>Jogador  %d\n</p>\n",  -e->tamanho[i]);
-	else if(e->tamanho[i] >= 10 && e->tamanho[i] <= 12)
-		printf("<p>Jogador  %d\n</p>\n",  (-2)* e->tamanho[i]);
-	else if(e->tamanho[i] == 13)
-		printf("<p>Jogador  %d\n</p>\n",  (-3) * e->tamanho[i]);
+	if(e.tamanho[i] <= 9 && e.tamanho[i] > 0)
+		printf("<p>Jogador  %d\n</p>\n",  -e.tamanho[i]);
+	else if(e.tamanho[i] >= 10 && e.tamanho[i] <= 12)
+		printf("<p>Jogador  %d\n</p>\n",  (-2)* e.tamanho[i]);
+	else if(e.tamanho[i] == 13)
+		printf("<p>Jogador  %d\n</p>\n",  (-3) * e.tamanho[i]);
 	else printf("<p>Jogador  Winner</p>\n" );
-	e->acao=1;
-	sprintf(script, "%s?%s", SCRIPT, estado2str(*e));
+	e.acao=1;
+	sprintf(script, "%s?%s", SCRIPT, estado2str(e));
 	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/baralhar.png\" /></a>\n", script, x, y, BOTOES);
 }
 
@@ -431,32 +432,32 @@ STATE joga_cartas_cpu (STATE e, int y) {
 /**
 Função encarregue de encontrar uma possível jogada para player
 */
-void sugereJogada (STATE *e) {
+void sugereJogada (STATE e) {
 	int n, v;
 	int x = 10;
 	int y = 600;
-	int nro = nroCartas(e->ultima_jogada);
+	int nro = nroCartas(e.ultima_jogada);
 	int nt;
 	MAO temp;
 				
 	for(n = 0; n < 4; n ++){
 		for(v = 0; v < 13; v ++){
 			temp = 0x0000000000000;
-			if(carta_existe(e->mao[3], n, v)){
+			if(carta_existe(e.mao[3], n, v)){
 				temp = add_carta(temp, n, v);
-				if(e->passar >= 3){
-					imprime_mao(x,y,*e,temp,v);
+				if(e.passar >= 3){
+					imprime_mao(x,y,e,temp,v);
 					break;
 				}	
-				else if(comparaMaos(e->ultima_jogada, temp)){
+				else if(comparaMaos(e.ultima_jogada, temp)){
 					 nt = 0;
 					 while(nroCartas(temp) < nro && nt < 4){
-						if(carta_existe(e->mao[3], nt, v) && nt != n)
+						if(carta_existe(e.mao[3], nt, v) && nt != n)
 							temp = add_carta(temp, nt, v);
 						nt ++;			
 					 }
 					 if(nroCartas(temp) == nro){
-						imprime_mao(x, y, *e, temp, v);
+						imprime_mao(x, y, e, temp, v);
 						break;	
 					 }
 				}
@@ -469,18 +470,19 @@ void sugereJogada (STATE *e) {
 /**
 Se os cpus tiverem o 3 de ouros esta função joga o 3 de ouros
 */	
-void joga_fst_cpu (STATE *e) {
+STATE joga_fst_cpu (STATE e) {
 	int y,i;
 	for (y=10, i=0; i<3; i++, y+=120) {
-		if (carta_existe(e->mao[i],0,0)) {
-			imprime_carta(530,y,*e,0,0);
-			e->ultima_jogada=add_carta(e->ultima_jogada,0,0);
+		if (carta_existe(e.mao[i],0,0)) {
+			imprime_carta(530,y,e,0,0);
+			e.ultima_jogada=add_carta(e.ultima_jogada,0,0);
 			break;
 		}
 	}
-	e->ultimo_jogador=i;
-	e->mao[e->ultimo_jogador]=retira_cartas(e->mao[e->ultimo_jogador],e->ultima_jogada);
-	e->tamanho[e->ultimo_jogador]=nroCartas(e->mao[e->ultimo_jogador]);
+	e.ultimo_jogador=i;
+	e.mao[e.ultimo_jogador]=retira_cartas(e.mao[e.ultimo_jogador],e.ultima_jogada);
+	e.tamanho[e.ultimo_jogador]=nroCartas(e.mao[e.ultimo_jogador]);
+	return e;
 }
 
 /**
@@ -522,11 +524,11 @@ STATE joga_cpu (STATE e) {
 Esta função está encarregue de imprimir o estado do jogo tendo em conta certos aspetos do mesmo. 
 @param STATE	O estado atual
 */
-void imprime(STATE *e) {
+void imprime(STATE e) {
 	int jv;
 	
-	if (e->tamanho[0]==0 || e->tamanho[1]==0 || e->tamanho[2]==0 || e->tamanho[3]==0) {
-		e->acao = 0;
+	if (e.tamanho[0]==0 || e.tamanho[1]==0 || e.tamanho[2]==0 || e.tamanho[3]==0) {
+		e.acao = 0;
 		fim(e);
 		return ;
 	}
@@ -534,45 +536,45 @@ void imprime(STATE *e) {
 		printf("<svg height = \"900\" width = \"1050\">\n");
 		printf("<rect x = \"0\" y = \"0\" height = \"900\" width = \"1050\" style = \"fill:#007700\"/>\n"); 
 		
-		if (e->tamanho[0]==13 && e->tamanho[1]==13 && e->tamanho[2]==13 && e->tamanho[3]==13) {
-			joga_fst_cpu(e);
-			if(e->ultimo_jogador == 3){
-				e->selecao = add_carta(e->selecao, 0, 0);
+		if (e.tamanho[0]==13 && e.tamanho[1]==13 && e.tamanho[2]==13 && e.tamanho[3]==13) {
+			e=joga_fst_cpu(e);
+			if(e.ultimo_jogador == 3){
+				e.selecao = add_carta(e.selecao, 0, 0);
 			}
-			else *e = joga_cpu(*e);
+			else e = joga_cpu(e);
 		}
 		
-		if(e->acao == 4){
+/*		if(e.acao == 4){
 			sugereJogada (e); 
-			e->acao = 0;
+			e.acao = 0;
 		}
-	
-		if (e->acao==3) {
-			imprime_mao(500,390,*e,e->selecao,4);
-			e->ultima_jogada=e->selecao;
-			e->mao[3]=retira_cartas(e->mao[3],e->ultima_jogada);
-			e->tamanho[3]=nroCartas(e->mao[3]);
-			e->ultimo_jogador=3;
-			e->selecao=0;
-			e->acao=0;
-			e->passar=0;
-			*e=joga_cpu(*e);
+*/	
+		if (e.acao==3) {
+			imprime_mao(500,390,e,e.selecao,4);
+			e.ultima_jogada=e.selecao;
+			e.mao[3]=retira_cartas(e.mao[3],e.ultima_jogada);
+			e.tamanho[3]=nroCartas(e.mao[3]);
+			e.ultimo_jogador=3;
+			e.selecao=0;
+			e.acao=0;
+			e.passar=0;
+			e=joga_cpu(e);
 		}
-		else if (e->acao==2) {
-			(e->passar)++;
-			e->ultimo_jogador=3;
-			e->acao=0;
-			*e=joga_cpu(*e);
+		else if (e.acao==2) {
+			(e.passar)++;
+			e.ultimo_jogador=3;
+			e.acao=0;
+			e=joga_cpu(e);
 		}
 
-		imprime_mao(10,10,*e,e->mao[0], 0);
-		imprime_mao(10,130,*e,e->mao[1],1);
-		imprime_mao(10,250,*e,e->mao[2],2);
-		imprime_mao(10,390,*e,e->mao[3],3);
+		imprime_mao(10,10,e,e.mao[0], 0);
+		imprime_mao(10,130,e,e.mao[1],1);
+		imprime_mao(10,250,e,e.mao[2],2);
+		imprime_mao(10,390,e,e.mao[3],3);
 
 
-		jv=jogadaValida(e->ultima_jogada, e->selecao,e->passar);
-		imprime_butoes(40,510,*e,jv);
+		jv=jogadaValida(e.ultima_jogada, e.selecao,e.passar);
+		imprime_butoes(40,510,e,jv);
 
 		printf("</svg>\n");
 	}
@@ -580,10 +582,10 @@ void imprime(STATE *e) {
 /**
 Função encarregue de distribuir as cartas, caso estas não tenham sido já distribuídas, e de chamar a funçao que faz o jogo "correr"
  */
-void parse(STATE *e) {
+void parse(STATE e) {
 
-	if(e->mao[0] == 0) {
-		distribuir(e);
+	if(e.mao[0] == 0) {
+		e=distribuir(e);
 	}
 
 	imprime(e);
@@ -623,7 +625,7 @@ int main() {
 		e.selecao=e.ultima_jogada=0;
 	}
 
-	parse(&e);
+	parse(e);
 
 	printf("</body>\n");
 	return 0;
