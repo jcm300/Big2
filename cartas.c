@@ -301,6 +301,107 @@ void fim(STATE e){
 	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/baralhar.png\" /></a>\n", script, x, y, BOTOES);
 }
 
+/** Função que retira as cartas de uma mão caso já esteja presente na seleção*/
+MAO retira_cartas (MAO mao, MAO s) {
+	int n,v;
+	for(v = 0; v < 13; v++) {
+		for(n = 0; n < 4; n++)
+				if(carta_existe(s, n, v)) {
+					mao=rem_carta(mao,n,v);
+			}
+	}	
+	return mao;
+}
+
+MAO jogaQuads (MAO mao) {
+	int n,v;
+	MAO temp=0;
+	if (nroCartas(mao)<5) return 0;
+	for(v = 0; v < 13; v ++){
+		if(carta_existe(mao,0,v) && carta_existe(mao,1,v) && carta_existe(mao,2,v) && carta_existe(mao,3,v)) {
+			for (n=0; n<4; n++) {
+				temp=add_carta(temp,n,v);
+				mao=rem_carta(mao,n,v);
+			}
+			for(n = 0; n < 4; n ++){
+				for(v = 0; v < 13; v ++){
+					if(carta_existe(mao,n,v)) {
+						temp=add_carta(temp,n,v);
+						return temp;
+					}
+				}
+			}
+		}
+	}
+	return 0;
+}
+
+MAO jogaFlush (MAO mao) {
+	int n,v,j=0;
+	MAO temp=0;
+	if (nroCartas(mao)<5) return 0;
+	for(n = 0; n < 4; n ++){
+		j=0;
+		temp=0;
+		for(v = 0; v < 13; v ++){
+			if(carta_existe(mao,n,v)){
+				j++;
+				temp=add_carta(temp,n,v);
+			}
+			if (j==5) {
+				return temp;
+			}
+		}
+	}
+	return 0;
+}
+
+MAO adiciona_cartas (MAO mao, MAO s) {
+	int n,v;
+	for(v = 0; v < 13; v++) {
+		for(n = 0; n < 4; n++)
+				if(carta_existe(s, n, v)) {
+					mao=add_carta(mao,n,v);
+			}
+	}	
+	return mao;
+}
+
+MAO jogaFullHouse (MAO mao) {
+	int n,v,n2,v2,j=0;
+	MAO temp=0;
+	MAO temp2=0;
+	if (nroCartas(mao)<5) return 0;
+	for(v = 0; v < 13; v ++){
+		j=0;
+		temp=0;
+		for(n = 0; n < 4; n ++){
+			if(carta_existe(mao,n,v)){
+				j++;
+				temp=add_carta(temp,n,v);
+			}
+			if(j==3){
+				mao=retira_cartas(mao,temp);
+				for(v2 = 0; v2 < 13; v2 ++){
+					j=0;
+					temp2=temp;
+					for(n2 = 0; n2 < 4; n2 ++){
+						if(carta_existe(mao,n2,v2)){
+							j++;
+							temp2=add_carta(temp2,n2,v2);
+						}
+						if(j==2){
+							return temp2;
+						}
+					}
+				}
+				mao=adiciona_cartas(mao,temp);
+			}
+		}
+	}
+	return 0;
+}
+
 /**
 Compara duas mãos por forma a validar a jogadaAtual em relação a jogadaAnt
 */
@@ -370,19 +471,6 @@ int jogadaValida(MAO jogadaAnt, MAO jogadaAtual, int passar){
 	else if(nroAnt != nroAg) return 0;
 	else if(comparaMaos(jogadaAnt, jogadaAtual)) return 1;
 	else return 0;
-}
-
-
-/** Função que retira as cartas de uma mão caso já esteja presente na seleção*/
-MAO retira_cartas (MAO mao, MAO s) {
-	int n,v;
-	for(v = 0; v < 13; v++) {
-		for(n = 0; n < 4; n++)
-				if(carta_existe(s, n, v)) {
-					mao=rem_carta(mao,n,v);
-			}
-	}	
-	return mao;
 }
 
 /**
