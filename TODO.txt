@@ -1,1 +1,2 @@
-Validar jogadas do player
+Validar jogadas de 5 maos
+Criar menu
