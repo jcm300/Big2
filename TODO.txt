@@ -1,2 +1,4 @@
-Validar jogadas de 5 maos
 Criar menu
+Validar:
+-Straight
+-Flush
