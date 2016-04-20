@@ -438,8 +438,15 @@ MAO retira_cartas (MAO mao, MAO s) {
 	}	
 	return mao;
 }
-int comparaStraight(MAO jogadaAtual, MAO jogadaAnt){
-
+int comparaStrEStrFlush(MAO jogadaAtual, MAO jogadaAnt){
+	int n;
+	for (n=0; n<4; n++) {
+		if(carta_existe(jogadaAtual,n,12) || carta_existe(jogadaAnt,n,12) || carta_existe(jogadaAnt,n,13) || carta_existe(jogadaAtual,n,13)) {
+			if (jogadaAtual>jogadaAnt) return 0;
+			else return 1;
+		}
+	}
+	return (comparaMaos(jogadaAnt,jogadaAtual));
 }
 
 MAO straight(MAO *mao, MAO *ultima_jogada, int *passar){
