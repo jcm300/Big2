@@ -439,13 +439,26 @@ MAO retira_cartas (MAO mao, MAO s) {
 	return mao;
 }
 
-int comparaStrEStrFlush(MAO jogadaAtual, MAO jogadaAnt){
+int existeValor (MAO mao, int v) {
 	int n;
-	for (n=0; n<4; n++) {
-		if(carta_existe(jogadaAtual,n,12) jogadaAtual=rem_carta(jogadaAtual,n,12);
-		if(carta_existe(jogadaAnt,n,12) jogadaAnt=rem_carta(jogadaAnt,n,12);
-		if(carta_existe(jogadaAnt,n,13) jogadaAnt=rem_carta(jogadaAnt,n,13);
-		if(carta_existe(jogadaAtual,n,13) jogadaAtual=rem_carta(jogadaAtual,n,13);
+	for (n=0, n<4, n++)
+		if(carta_existe(mao,n,v)) break;
+	return n;
+}
+
+int comparaStrEStrFlush(MAO jogadaAtual, MAO jogadaAnt){
+	int n1,n2;
+	n1=existeValor(jogadaAtual,11);
+	n2=existeValor(jogadaAtual,12);
+	if(n2!=4) {
+		if (n1!=4) jogadaAtual=rem_carta(jogadaAtual,n,11);
+		jogadaAtual=rem_carta(jogadaAtual,n,12);
+	} 
+	n1=existeValor(jogadaAnt,11);
+	n2=existeValor(jogadaAnt,12);
+	if(n2!=4) {
+		if (n1!=4) jogadaAnt=rem_carta(jogadaAnt,n,11);
+		jogadaAnt=rem_carta(jogadaAnt,n,12);
 	}
 	return (comparaMaos(jogadaAnt,jogadaAtual));
 }
