@@ -438,13 +438,14 @@ MAO retira_cartas (MAO mao, MAO s) {
 	}	
 	return mao;
 }
+
 int comparaStrEStrFlush(MAO jogadaAtual, MAO jogadaAnt){
 	int n;
 	for (n=0; n<4; n++) {
-		if(carta_existe(jogadaAtual,n,12) || carta_existe(jogadaAnt,n,12) || carta_existe(jogadaAnt,n,13) || carta_existe(jogadaAtual,n,13)) {
-			if (jogadaAtual>jogadaAnt) return 0;
-			else return 1;
-		}
+		if(carta_existe(jogadaAtual,n,12) jogadaAtual=rem_carta(jogadaAtual,n,12);
+		if(carta_existe(jogadaAnt,n,12) jogadaAnt=rem_carta(jogadaAnt,n,12);
+		if(carta_existe(jogadaAnt,n,13) jogadaAnt=rem_carta(jogadaAnt,n,13);
+		if(carta_existe(jogadaAtual,n,13) jogadaAtual=rem_carta(jogadaAtual,n,13);
 	}
 	return (comparaMaos(jogadaAnt,jogadaAtual));
 }
