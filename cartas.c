@@ -692,11 +692,54 @@ MAO jogaFullHouse (MAO mao,MAO jogadaAnt) {
 	return 0;
 }
 
-/*
-STATE identificaJogada(STATE e, MAO jogada){
+
+int identificaJogada(STATE e, MAO jogada){
+	int nA[5] = {0};
+	int vA[5] = {0};
+	int n, v, i;
+	i = 0;
+
+
+	/*Identifica um Quads */
+	for(v = 0; v < 13; v ++){
+		n = 0;
+		while(carta_existe(jogada, n, v) && n < 4) n ++;
+		if(n == 4) return 1;
+	}
+	
+	/*Identifica um full house*/
+	for(v = 0; v < 13; v ++){
+		n = 0;
+		c = 0;
+		while(n < 4){
+			if(carta_existe(jogada, n, v){
+				c ++;
+			}
+			n ++;
+		}
+		if(c == 3) return 2;
+	}
+
+	for(n = 0; n < 4; n ++{
+		for(v = 0; v < 13; v ++){
+			while(carta_existe(jogada, n, v) 	
+
+		}
+	}	
+	
+
 
 }
-*/
+
+
+
+STATE jogaComb(STATE e){
+	
+
+
+
+}
+
 
 /**
 Realiza uma jogada tendo em conta a mão e a ultima_jogada
@@ -802,6 +845,9 @@ Função encarrege de fazer os cpus jogar
 STATE joga_cpu (STATE e) {
 	if(e.ultimo_jogador == 3){
 		e.ultimo_jogador=0;
+		if(nroCartas(e.ultima_jogada) == 5){
+			e=jogaComb(e);
+		}
 		e=joga_cartas_cpu(e,10);
 		e.mao[0]=retira_cartas(e.mao[0],e.ultima_jogada);
 		e.tamanho[0]=nroCartas(e.mao[0]);
