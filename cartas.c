@@ -441,7 +441,7 @@ MAO retira_cartas (MAO mao, MAO s) {
 
 int existeValor (MAO mao, int v) {
 	int n;
-	for (n=0, n<4, n++)
+	for (n=0; n<4; n++)
 		if(carta_existe(mao,n,v)) break;
 	return n;
 }
@@ -590,7 +590,7 @@ MAO jogaQuads (MAO mao) {
 	return 0;
 }
 
-MAO jogaFlush (MAO mao) {
+MAO jogaFlush (MAO mao, MAO jogadaAnt) {
 	int n,v,j=0;
 	MAO temp=0;
 	if (nroCartas(mao)<5) return 0;
@@ -602,7 +602,7 @@ MAO jogaFlush (MAO mao) {
 				j++;
 				temp=add_carta(temp,n,v);
 			}
-			if (comparaMaos2(temp, ) && j==5) {
+			if (comparaMaos2(jogadaAnt,temp) && j==5) {
 				return temp;
 			}
 		}
@@ -657,7 +657,7 @@ int comparaFullHouse(MAO jogadaAnt, MAO jogadaAtual){
 
 
 
-MAO jogaFullHouse (MAO mao) {
+MAO jogaFullHouse (MAO mao,MAO jogadaAnt) {
 	int n,v,n2,v2,j=0;
 	MAO temp=0;
 	MAO temp2=0;
@@ -680,7 +680,7 @@ MAO jogaFullHouse (MAO mao) {
 							j++;
 							temp2=add_carta(temp2,n2,v2);
 						}
-						if(j==2){
+						if(j==2 && comparaFullHouse(jogadaAnt,temp2)){
 							return temp2;
 						}
 					}
