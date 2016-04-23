@@ -110,6 +110,18 @@ int nroCartas(MAO m){
 	return r;	
 }
 
+/**Verifica se um determinado valor pertenceà mao, independentemente do naipe do mesmo
+@param mao A mão onde se irá procurar o valor indicado 
+@param valor O valor a procurar
+@return 1 se o valor existir, 0 caso este não esteja presente
+*/
+int valor_existe(MAO mao, int valor) {
+	int idx[4], i;
+	for(i = 0; i < 4; i ++)	idx[i] = indice(i, valor);
+	return (((mao >> idx[0]) & 1) || ((mao >> idx[1]) & 1) || ((mao >> idx[2]) & 1) || ((mao >> idx[3]) & 1));
+}
+
+
 /**
 Função que distribui as cartas
 */
@@ -693,14 +705,11 @@ MAO jogaFullHouse (MAO mao,MAO jogadaAnt) {
 }
 
 
-int identificaJogada(STATE e, MAO jogada){
-	int nA[5] = {0};
-	int vA[5] = {0};
-	int n, v, i;
-	i = 0;
+int identificaJogada(MAO jogada){
+	int n1, n2, n, v, vt, c;
 
 
-	/*Identifica um Quads */
+	/*Identifica um Quads*/
 	for(v = 0; v < 13; v ++){
 		n = 0;
 		while(carta_existe(jogada, n, v) && n < 4) n ++;
@@ -712,32 +721,80 @@ int identificaJogada(STATE e, MAO jogada){
 		n = 0;
 		c = 0;
 		while(n < 4){
-			if(carta_existe(jogada, n, v){
+			if(carta_existe(jogada, n, v)){
 				c ++;
 			}
 			n ++;
 		}
 		if(c == 3) return 2;
 	}
-
-	for(n = 0; n < 4; n ++{
-		for(v = 0; v < 13; v ++){
-			while(carta_existe(jogada, n, v) 	
-
+	
+	/*Identifica um straight flush ou um flush*/
+	for(n = 0; n < 4; n ++){
+		n1 = carta_existe(jogada, n, 11);
+		n2 = carta_existe(jogada, n, 12);
+		for(v = 0; v < 8; v ++){ 
+			if(carta_existe(jogada, n, v)){
+				c = 1;
+				vt = v + 1;
+				while(c < 5){
+					if(carta_existe(jogada, n, vt)){
+						c ++;	
+						vt ++;
+					}
+				}
+				if(vt == v+4)
+					return 3;
+				else if(vt == v+3 && (n1 != n2) && v == 0)
+					return 3; 	
+				else if(vt == v+2 && n1 && n2 && v == 0)
+					return 3;
+				else if(c == 5)
+					return 4;
+			}
 		}
 	}	
-	
 
-
+	n1 = valor_existe(jogada, 11);
+	n2 = valor_existe(jogada, 12);
+	/*Identifica um straight*/
+	for(v = 0; v < 8; v ++){
+		if(valor_existe(jogada, v)){
+			n = 0;
+			vt = v + 1;
+			c = 1;
+			while(c < 5 && valor_existe(jogada, vt)){
+					vt ++;
+					c ++;
+			}
+			if(c == 5) return 5;
+			else if(c == 4 && (n1 || n2) && v == 0)
+				return 5; 	
+			else if(c == 3 && n1 && n2 && v == 0)
+				return 5;
+		}
+	}
+	return 0;
 }
 
 
-
 STATE jogaComb(STATE e){
-	
-
-
-
+	int tjogada = identificaJogada(e.ultima_jogada);
+	switch(tjogada){
+		case 1:
+			break;
+		case 2:
+			break;
+		case 3:
+			break;
+		case 4:
+			break;
+		case 5:
+			break;
+		default:
+			break;
+	}
+	return e;
 }
 
 
@@ -845,9 +902,10 @@ Função encarrege de fazer os cpus jogar
 STATE joga_cpu (STATE e) {
 	if(e.ultimo_jogador == 3){
 		e.ultimo_jogador=0;
-		if(nroCartas(e.ultima_jogada) == 5){
+/*		if(nroCartas(e.ultima_jogada) == 5){
 			e=jogaComb(e);
 		}
+*/
 		e=joga_cartas_cpu(e,10);
 		e.mao[0]=retira_cartas(e.mao[0],e.ultima_jogada);
 		e.tamanho[0]=nroCartas(e.mao[0]);
