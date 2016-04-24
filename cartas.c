@@ -120,7 +120,17 @@ int valor_existe(MAO mao, int valor) {
 	for(i = 0; i < 4; i ++)	idx[i] = indice(i, valor);
 	return (((mao >> idx[0]) & 1) || ((mao >> idx[1]) & 1) || ((mao >> idx[2]) & 1) || ((mao >> idx[3]) & 1));
 }
-
+/**Devolve a primeira ocorrência de um determinado valor na mão dada
+@param mao Mao a percorrer
+@param v valor a procurar
+@return naipe do valor indicado, caso este valor não esteja presente a funcao devolve 4
+*/
+int existeValor (MAO mao, int v) {
+	int n;
+	for (n=0; n<4; n++)
+		if(carta_existe(mao,n,v)) break;
+	return n;
+}
 
 /**
 Função que distribui as cartas
@@ -422,117 +432,6 @@ int cartasDiferentes(MAO jogadaAtual){
 	return 1;
 }
 
-/**Função encarregue de verificar a validade da seleção do jogador*/
-int jogadaValida(MAO jogadaAnt, MAO jogadaAtual, int passar){
-
-	int nroAg, nroAnt;
-	nroAnt = nroCartas(jogadaAnt);
-	nroAg = nroCartas(jogadaAtual);
-
-	if(nroAg <= 0 || nroAg >=4) return 0;
-	else if(!(cartasDiferentes(jogadaAtual))) return 0;	
-	else if(passar >=3) return 1;
-	else if(nroAnt == 0) return 1;
-	else if(nroAnt != nroAg) return 0;
-	else if(comparaMaos(jogadaAnt, jogadaAtual)) return 1;
-	else return 0;
-}
-
-
-/** Função que retira as cartas de uma mão caso já esteja presente na seleção*/
-MAO retira_cartas (MAO mao, MAO s) {
-	int n,v;
-	for(v = 0; v < 13; v++) {
-		for(n = 0; n < 4; n++)
-				if(carta_existe(s, n, v)) {
-					mao=rem_carta(mao,n,v);
-			}
-	}	
-	return mao;
-}
-
-int existeValor (MAO mao, int v) {
-	int n;
-	for (n=0; n<4; n++)
-		if(carta_existe(mao,n,v)) break;
-	return n;
-}
-
-int comparaStrEStrFlush(MAO jogadaAtual, MAO jogadaAnt){
-	int n1,n2;
-	n1=existeValor(jogadaAtual,11);
-	n2=existeValor(jogadaAtual,12);
-	if(n2!=4) {
-		if (n1!=4) jogadaAtual=rem_carta(jogadaAtual,n1,11);
-		jogadaAtual=rem_carta(jogadaAtual,n2,12);
-	} 
-	n1=existeValor(jogadaAnt,11);
-	n2=existeValor(jogadaAnt,12);
-	if(n2!=4) {
-		if (n1!=4) jogadaAnt=rem_carta(jogadaAnt,n1,11);
-		jogadaAnt=rem_carta(jogadaAnt,n2,12);
-	}
-	return (comparaMaos(jogadaAnt,jogadaAtual));
-}
-
-MAO jogaStraight(MAO mao, MAO jogadaAnt){
-	MAO temp;
-	int vt, n, v, nt;
-
-	for(n = 0; n < 4; n ++){
-		for(v = 0; v < 13; v ++){
-			temp = 0x0000000000000;
-			if(carta_existe(mao, n, v)){
-				temp = add_carta(temp,n, v); 
-				vt = v+1;
-				while(nroCartas(temp) < 5 && vt < 13){
-					nt = 0;		
-					while(nt<4){
-						if(carta_existe(mao, nt,vt)){
-							temp=add_carta(temp,nt, vt);	
-							break;
-						}
-						nt ++;
-					}
-					if(nt == 4) break;
-					vt ++;
-				}
-				if(nroCartas(temp) == 5 && comparaStrEStrFlush(temp, jogadaAnt)){
-					return temp;
-				}
-				else break;
-			}		
-		}
-	}		
-	return 0;
-}
-
-
-MAO jogaStraightFlush(MAO mao, MAO jogadaAnt){
-	MAO temp;
-	int vt, n, v;
-
-	for(n = 0; n < 4; n ++){
-		for(v = 0; v < 13; v ++){
-			temp = 0x0000000000000;
-			if(carta_existe(mao, n, v)){
-				temp = add_carta(temp,n, v); 
-				vt = 0;
-				while(nroCartas(temp) < 5 && vt < 13){
-					if(carta_existe(mao, n, vt) && vt != v)
-						temp=add_carta(temp,n, vt);	
-					vt ++;			
-				}	
-				if(nroCartas(temp) == 5 && comparaStrEStrFlush(jogadaAnt, temp)){
-					return temp;
-				}
-				else break;
-			}		
-		}
-	}		
-	return 0;
-}
-
 int comparaQuads(MAO jogadaAnt, MAO jogadaAtual){
 	int v  = 0, v1 = 0, v2 = 0;
 
@@ -556,59 +455,21 @@ int comparaQuads(MAO jogadaAnt, MAO jogadaAtual){
 	return (v1<v2);
 }
 
-
-MAO jogaQuads (MAO mao,MAO jogadaAnt) {
-	int n,v;
-	MAO temp=0;
-	if (nroCartas(mao)<5) return 0;
-	for(v = 0; v < 13; v ++){
-		if(carta_existe(mao,0,v) && carta_existe(mao,1,v) && carta_existe(mao,2,v) && carta_existe(mao,3,v)) {
-			for (n=0; n<4; n++) {
-				temp=add_carta(temp,n,v);
-				mao=rem_carta(mao,n,v);
-			}
-			for(n = 0; n < 4; n ++){
-				for(v = 0; v < 13; v ++){
-					if(carta_existe(mao,n,v)) {
-						temp=add_carta(temp,n,v);
-						if(comparaQuads(jogadaAnt,temp)) return temp;
-					}
-				}
-			}
-		}
+int comparaStrEStrFlush(MAO jogadaAtual, MAO jogadaAnt){
+	int n1,n2;
+	n1=existeValor(jogadaAtual,11);
+	n2=existeValor(jogadaAtual,12);
+	if(n2!=4) {
+		if (n1!=4) jogadaAtual=rem_carta(jogadaAtual,n1,11);
+		jogadaAtual=rem_carta(jogadaAtual,n2,12);
+	} 
+	n1=existeValor(jogadaAnt,11);
+	n2=existeValor(jogadaAnt,12);
+	if(n2!=4) {
+		if (n1!=4) jogadaAnt=rem_carta(jogadaAnt,n1,11);
+		jogadaAnt=rem_carta(jogadaAnt,n2,12);
 	}
-	return 0;
-}
-
-MAO jogaFlush (MAO mao, MAO jogadaAnt) {
-	int n,v,j=0;
-	MAO temp=0;
-	if (nroCartas(mao)<5) return 0;
-	for(n = 0; n < 4; n ++){
-		j=0;
-		temp=0;
-		for(v = 0; v < 13; v ++){
-			if(carta_existe(mao,n,v)){
-				j++;
-				temp=add_carta(temp,n,v);
-			}
-			if (comparaMaos2(jogadaAnt,temp) && j==5) {
-				return temp;
-			}
-		}
-	}
-	return 0;
-}
-
-MAO adiciona_cartas (MAO mao, MAO s) {
-	int n,v;
-	for(v = 0; v < 13; v++) {
-		for(n = 0; n < 4; n++)
-				if(carta_existe(s, n, v)) {
-					mao=add_carta(mao,n,v);
-			}
-	}	
-	return mao;
+	return (comparaMaos(jogadaAnt,jogadaAtual));
 }
 
 int comparaFullHouse(MAO jogadaAnt, MAO jogadaAtual){
@@ -642,44 +503,6 @@ int comparaFullHouse(MAO jogadaAnt, MAO jogadaAtual){
 	}	
 	return (v1<v2);
 }
-
-
-
-MAO jogaFullHouse (MAO mao,MAO jogadaAnt) {
-	int n,v,n2,v2,j=0;
-	MAO temp=0;
-	MAO temp2=0;
-	if (nroCartas(mao)<5) return 0;
-	for(v = 0; v < 13; v ++){
-		j=0;
-		temp=0;
-		for(n = 0; n < 4; n ++){
-			if(carta_existe(mao,n,v)){
-				j++;
-				temp=add_carta(temp,n,v);
-			}
-			if(j==3){
-				mao=retira_cartas(mao,temp);
-				for(v2 = 0; v2 < 13; v2 ++){
-					j=0;
-					temp2=temp;
-					for(n2 = 0; n2 < 4; n2 ++){
-						if(carta_existe(mao,n2,v2)){
-							j++;
-							temp2=add_carta(temp2,n2,v2);
-						}
-						if(j==2 && comparaFullHouse(jogadaAnt,temp2)){
-							return temp2;
-						}
-					}
-				}
-				mao=adiciona_cartas(mao,temp);
-			}
-		}
-	}
-	return 0;
-}
-
 
 int identificaJogada(MAO jogada){
 	int n1, n2, n, v, vt, c;
@@ -753,9 +576,222 @@ int identificaJogada(MAO jogada){
 	return 0;
 }
 
+/**Função encarregue de verificar a validade da seleção do jogador*/
+int jogadaValida(MAO jogadaAnt, MAO jogadaAtual, int passar){
+
+	int nroAg, nroAnt;
+	nroAnt = nroCartas(jogadaAnt);
+	nroAg = nroCartas(jogadaAtual);
+
+	if(nroAg <= 0 || nroAg >5 || nroAg == 4) return 0;
+	else if(nroAg == 5 && nroAg != nroAnt && passar < 3) return 0;
+	else if(nroAg == 5 && identificaJogada(jogadaAtual) && passar >= 3) return 1;
+	else if(nroAg == 5){
+		if(identificaJogada(jogadaAtual) != identificaJogada(jogadaAnt)) return 0;
+		switch(identificaJogada(jogadaAtual)){
+			case 1: 
+				return comparaQuads(jogadaAnt, jogadaAtual);
+				break;
+			case 2: 
+				return comparaFullHouse(jogadaAnt, jogadaAtual);
+				break;
+			case 3: 
+				return comparaStrEStrFlush(jogadaAtual, jogadaAnt);
+				break;
+			case 4: 
+				return comparaMaos2(jogadaAnt, jogadaAtual);
+				break;
+			case 5: 
+				return comparaStrEStrFlush(jogadaAtual, jogadaAnt);
+				break;
+			default:
+				return 0;
+				break;
+		}
+
+	} 
+	else if(!(cartasDiferentes(jogadaAtual))) return 0;	
+	else if(passar >=3) return 1;
+	else if(nroAnt == 0) return 1;
+	else if(nroAnt != nroAg) return 0;
+	else if(comparaMaos(jogadaAnt, jogadaAtual)) return 1;
+	else return 0;
+}
+
+
+/** Função que retira as cartas de uma mão caso já esteja presente na seleção*/
+MAO retira_cartas (MAO mao, MAO s) {
+	int n,v;
+	for(v = 0; v < 13; v++) {
+		for(n = 0; n < 4; n++)
+				if(carta_existe(s, n, v)) {
+					mao=rem_carta(mao,n,v);
+			}
+	}	
+	return mao;
+}
+
+
+MAO jogaStraight(MAO mao, MAO jogadaAnt){
+	MAO temp;
+	int vt, n, v, nt;
+
+	for(n = 0; n < 4; n ++){
+		for(v = 0; v < 13; v ++){
+			temp = 0x0000000000000;
+			if(carta_existe(mao, n, v)){
+				temp = add_carta(temp,n, v); 
+				vt = v+1;
+				while(nroCartas(temp) < 5 && vt < 13){
+					nt = 0;		
+					while(nt<4){
+						if(carta_existe(mao, nt,vt)){
+							temp=add_carta(temp,nt, vt);	
+							break;
+						}
+						nt ++;
+					}
+					if(nt == 4) break;
+					vt ++;
+				}
+				if(nroCartas(temp) == 5 && comparaStrEStrFlush(temp, jogadaAnt)){
+					return temp;
+				}
+				else break;
+			}		
+		}
+	}		
+	return 0;
+}
+
+
+MAO jogaStraightFlush(MAO mao, MAO jogadaAnt){
+	MAO temp;
+	int vt, n, v;
+
+	for(n = 0; n < 4; n ++){
+		for(v = 0; v < 13; v ++){
+			temp = 0x0000000000000;
+			if(carta_existe(mao, n, v)){
+				temp = add_carta(temp,n, v); 
+				vt = 0;
+				while(nroCartas(temp) < 5 && vt < 13){
+					if(carta_existe(mao, n, vt) && vt != v)
+						temp=add_carta(temp,n, vt);	
+					vt ++;			
+				}	
+				if(nroCartas(temp) == 5 && comparaStrEStrFlush(jogadaAnt, temp)){
+					return temp;
+				}
+				else break;
+			}		
+		}
+	}		
+	return 0;
+}
+
+
+
+
+MAO jogaQuads (MAO mao,MAO jogadaAnt) {
+	int n,v;
+	MAO temp=0;
+	if (nroCartas(mao)<5) return 0;
+	for(v = 0; v < 13; v ++){
+		if(carta_existe(mao,0,v) && carta_existe(mao,1,v) && carta_existe(mao,2,v) && carta_existe(mao,3,v)) {
+			for (n=0; n<4; n++) {
+				temp=add_carta(temp,n,v);
+				mao=rem_carta(mao,n,v);
+			}
+			for(n = 0; n < 4; n ++){
+				for(v = 0; v < 13; v ++){
+					if(carta_existe(mao,n,v)) {
+						temp=add_carta(temp,n,v);
+						if(comparaQuads(jogadaAnt,temp)) return temp;
+					}
+				}
+			}
+		}
+	}
+	return 0;
+}
+
+MAO jogaFlush (MAO mao, MAO jogadaAnt) {
+	int n,v,j=0;
+	MAO temp=0;
+	if (nroCartas(mao)<5) return 0;
+	for(n = 0; n < 4; n ++){
+		j=0;
+		temp=0;
+		for(v = 0; v < 13; v ++){
+			if(carta_existe(mao,n,v)){
+				j++;
+				temp=add_carta(temp,n,v);
+			}
+			if (comparaMaos2(jogadaAnt,temp) && j==5) {
+				return temp;
+			}
+		}
+	}
+	return 0;
+}
+
+MAO adiciona_cartas (MAO mao, MAO s) {
+	int n,v;
+	for(v = 0; v < 13; v++) {
+		for(n = 0; n < 4; n++)
+				if(carta_existe(s, n, v)) {
+					mao=add_carta(mao,n,v);
+			}
+	}	
+	return mao;
+}
+
+
+
+
+
+MAO jogaFullHouse (MAO mao,MAO jogadaAnt) {
+	int n,v,n2,v2,j=0;
+	MAO temp=0;
+	MAO temp2=0;
+	if (nroCartas(mao)<5) return 0;
+	for(v = 0; v < 13; v ++){
+		j=0;
+		temp=0;
+		for(n = 0; n < 4; n ++){
+			if(carta_existe(mao,n,v)){
+				j++;
+				temp=add_carta(temp,n,v);
+			}
+			if(j==3){
+				mao=retira_cartas(mao,temp);
+				for(v2 = 0; v2 < 13; v2 ++){
+					j=0;
+					temp2=temp;
+					for(n2 = 0; n2 < 4; n2 ++){
+						if(carta_existe(mao,n2,v2)){
+							j++;
+							temp2=add_carta(temp2,n2,v2);
+						}
+						if(j==2 && comparaFullHouse(jogadaAnt,temp2)){
+							return temp2;
+						}
+					}
+				}
+				mao=adiciona_cartas(mao,temp);
+			}
+		}
+	}
+	return 0;
+}
+
+
+
+
 
 STATE jogaComb(STATE e, int y){
-	MAO jogadaAjogar=0;
+	MAO jogadaAjogar;
 	int tjogada = identificaJogada(e.ultima_jogada);
 	switch(tjogada){
 		case 1:
@@ -774,6 +810,7 @@ STATE jogaComb(STATE e, int y){
 			jogadaAjogar=jogaStraight(e.mao[e.ultimo_jogador],e.ultima_jogada);
 			break;
 		default:
+			jogadaAjogar = 0;
 			break;
 	}
 	if (jogadaAjogar==0) e.passar++;
@@ -889,40 +926,46 @@ STATE joga_fst_cpu (STATE e) {
 Função encarrege de fazer os cpus jogar
 */
 STATE joga_cpu (STATE e) {
-	MAO jogadaAjogar=0;
-	int n;
-	int y=10;
-	for (n=0; n<3; n++) {
-		e.ultimo_jogador=n;
-		if (e.passar==3) {
-			if (nroCartas(e.mao[e.ultimo_jogador])<5) e=joga_cartas_cpu(e,y);
-			else {
-				jogadaAjogar=jogaQuads(e.mao[e.ultimo_jogador],e.ultima_jogada);
-				if (jogadaAjogar==0) jogadaAjogar=jogaFullHouse(e.mao[e.ultimo_jogador],e.ultima_jogada);
-				if (jogadaAjogar==0) jogadaAjogar=jogaStraightFlush(e.mao[e.ultimo_jogador],e.ultima_jogada);
-				if (jogadaAjogar==0) jogadaAjogar=jogaFlush(e.mao[e.ultimo_jogador],e.ultima_jogada);
-				if (jogadaAjogar==0) jogadaAjogar=jogaStraight(e.mao[e.ultimo_jogador],e.ultima_jogada);
-			}
-			if (jogadaAjogar==0) e=joga_cartas_cpu(e,y);
-			else {
-			imprime_mao(500, y, e, jogadaAjogar, 4);
-			retira_cartas(e.mao[e.ultimo_jogador],jogadaAjogar);
-			e.ultima_jogada=jogadaAjogar;
-			e.passar=0;
-			}
+	if(e.ultimo_jogador == 3){
+		e.ultimo_jogador=0;
+		if(nroCartas(e.ultima_jogada) == 5){
+			e=jogaComb(e,10);
 		} else {
-			if(nroCartas(e.ultima_jogada) == 5){
-				e=jogaComb(e,y);
-			} else {
-				e=joga_cartas_cpu(e,y);
-				e.mao[n]=retira_cartas(e.mao[n],e.ultima_jogada);
-			}
-			e.tamanho[n]=nroCartas(e.mao[n]);
-			if(e.tamanho[n] == 0){
-				break;
-			}
+		e=joga_cartas_cpu(e,10);
+		e.mao[0]=retira_cartas(e.mao[0],e.ultima_jogada);
 		}
-		y +=120;
+		e.tamanho[0]=nroCartas(e.mao[0]);
+		if(e.tamanho[0] == 0){
+			e.ultimo_jogador = 4;
+		} 
+	}
+
+	if (e.ultimo_jogador==0) {
+		e.ultimo_jogador=1;
+		if(nroCartas(e.ultima_jogada) == 5){
+			e=jogaComb(e,130);
+		} else {
+		e=joga_cartas_cpu(e,130);
+		e.mao[1]=retira_cartas(e.mao[1],e.ultima_jogada);
+		}
+		e.tamanho[1]=nroCartas(e.mao[1]);
+		if(e.tamanho[1] == 0){
+			e.ultimo_jogador = 4;
+		}
+	}
+
+	if (e.ultimo_jogador==1) {
+		e.ultimo_jogador=2;
+		if(nroCartas(e.ultima_jogada) == 5){
+			e=jogaComb(e,250);
+		} else {
+		e=joga_cartas_cpu(e,250);
+		e.mao[2]=retira_cartas(e.mao[2],e.ultima_jogada);
+		}
+		e.tamanho[2]=nroCartas(e.mao[2]);
+		if(e.tamanho[2] == 0){
+			e.ultimo_jogador = 4;
+		}
 	}
 	return e;
 }
@@ -940,6 +983,7 @@ void imprime(STATE e) {
 	}
 	printf("<svg height = \"900\" width = \"1050\">\n");
 	printf("<rect x = \"0\" y = \"0\" height = \"900\" width = \"1050\" style = \"fill:#007700\"/>\n"); 
+
 	
 	if (e.tamanho[0]==13 && e.tamanho[1]==13 && e.tamanho[2]==13 && e.tamanho[3]==13) {
 		e=joga_fst_cpu(e);
@@ -965,19 +1009,19 @@ void imprime(STATE e) {
 		e.selecao=0;
 		e=joga_cpu(e);
 	}
+	
 	if (e.acao==2) {
 		e.passar++;
 		e.ultimo_jogador=3;
 		e.acao=0;
 		e=joga_cpu(e);
 	}
-
+	
 	imprime_mao(10,10,e,e.mao[0], 0);
 	imprime_mao(10,130,e,e.mao[1],1);
 	imprime_mao(10,250,e,e.mao[2],2);
 	imprime_mao(10,390,e,e.mao[3],3);
-
-
+	
 	jv=jogadaValida(e.ultima_jogada, e.selecao,e.passar);
 	imprime_butoes(40,510,e,jv);
 
