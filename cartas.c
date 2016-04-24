@@ -475,20 +475,20 @@ int comparaStrEStrFlush(MAO jogadaAtual, MAO jogadaAnt){
 	return (comparaMaos(jogadaAnt,jogadaAtual));
 }
 
-MAO straight(MAO *mao, MAO *ultima_jogada, int *passar){
+MAO jogaStraight(MAO mao, MAO jogadaAnt){
 	MAO temp;
 	int vt, n, v, nt;
 
 	for(n = 0; n < 4; n ++){
 		for(v = 0; v < 13; v ++){
 			temp = 0x0000000000000;
-			if(carta_existe(*mao, n, v)){
+			if(carta_existe(mao, n, v)){
 				temp = add_carta(temp,n, v); 
 				vt = v+1;
 				while(nroCartas(temp) < 5 && vt < 13){
 					nt = 0;		
 					while(nt<4){
-						if(carta_existe(*mao, nt,vt)){
+						if(carta_existe(mao, nt,vt)){
 							temp=add_carta(temp,nt, vt);	
 							break;
 						}
@@ -497,56 +497,34 @@ MAO straight(MAO *mao, MAO *ultima_jogada, int *passar){
 					if(nt == 4) break;
 					vt ++;
 				}
-				if(nroCartas(temp) == 5){
-					if(*passar >= 3){
-						*passar = 0;	
-						*mao = retira_cartas(*mao, temp);
-						return temp;
-					}
-					else if(comparaStrEStrFlush(temp, *ultima_jogada)){
-						*passar = 0;
-						*mao = retira_cartas(*mao, temp);
-						*ultima_jogada = temp;
-						return temp;
-					}
+				if(nroCartas(temp) == 5 && comparaStrEStrFlush(temp, jogadaAnt)){
+					return temp;
 				}
 				else break;
 			}		
 		}
 	}		
-	(*passar) ++;
 	return 0;
 }
 
 
-MAO straightFlush(MAO *mao, MAO *ultima_jogada, int *passar){
+MAO jogaStraightFlush(MAO mao, MAO jogadaAnt){
 	MAO temp;
 	int vt, n, v;
 
 	for(n = 0; n < 4; n ++){
 		for(v = 0; v < 13; v ++){
 			temp = 0x0000000000000;
-			if(carta_existe(*mao, n, v)){
+			if(carta_existe(mao, n, v)){
 				temp = add_carta(temp,n, v); 
 				vt = 0;
 				while(nroCartas(temp) < 5 && vt < 13){
-					if(carta_existe(*mao, n, vt) && vt != v)
+					if(carta_existe(mao, n, vt) && vt != v)
 						temp=add_carta(temp,n, vt);	
-					vt ++;
-							
+					vt ++;			
 				}	
-				if(nroCartas(temp) == 5){
-					if(*passar >= 3){
-						*passar = 0;	
-						*mao = retira_cartas(*mao, temp);
-						return temp;
-					}
-					else if(comparaStrEStrFlush(*ultima_jogada, temp)){
-						*passar = 0;
-						*mao = retira_cartas(*mao, temp);
-						*ultima_jogada = temp;
-						return temp;
-					}
+				if(nroCartas(temp) == 5 && comparaStrEStrFlush(jogadaAnt, temp)){
+					return temp;
 				}
 				else break;
 			}		
@@ -661,9 +639,7 @@ int comparaFullHouse(MAO jogadaAnt, MAO jogadaAtual){
 			v2 = v;
 			break;
 		}
-	}
-
-	
+	}	
 	return (v1<v2);
 }
 
@@ -778,21 +754,34 @@ int identificaJogada(MAO jogada){
 }
 
 
-STATE jogaComb(STATE e){
+STATE jogaComb(STATE e, int y){
+	MAO jogadaAjogar=0;
 	int tjogada = identificaJogada(e.ultima_jogada);
 	switch(tjogada){
 		case 1:
+			jogadaAjogar=jogaQuads(e.mao[e.ultimo_jogador],e.ultima_jogada);
 			break;
 		case 2:
+			jogadaAjogar=jogaFullHouse(e.mao[e.ultimo_jogador],e.ultima_jogada);
 			break;
 		case 3:
+			jogadaAjogar=jogaStraightFlush(e.mao[e.ultimo_jogador],e.ultima_jogada);
 			break;
 		case 4:
+			jogadaAjogar=jogaFlush(e.mao[e.ultimo_jogador],e.ultima_jogada);
 			break;
 		case 5:
+			jogadaAjogar=jogaStraight(e.mao[e.ultimo_jogador],e.ultima_jogada);
 			break;
 		default:
 			break;
+	}
+	if (jogadaAjogar==0) e.passar++;
+	else {
+		imprime_mao(500, y, e, jogadaAjogar, 4);
+		retira_cartas(e.mao[e.ultimo_jogador],jogadaAjogar);
+		e.ultima_jogada=jogadaAjogar;
+		e.passar=0;
 	}
 	return e;
 }
@@ -902,12 +891,12 @@ Função encarrege de fazer os cpus jogar
 STATE joga_cpu (STATE e) {
 	if(e.ultimo_jogador == 3){
 		e.ultimo_jogador=0;
-/*		if(nroCartas(e.ultima_jogada) == 5){
-			e=jogaComb(e);
-		}
-*/
+		if(nroCartas(e.ultima_jogada) == 5){
+			e=jogaComb(e,10);
+		} else {
 		e=joga_cartas_cpu(e,10);
 		e.mao[0]=retira_cartas(e.mao[0],e.ultima_jogada);
+		}
 		e.tamanho[0]=nroCartas(e.mao[0]);
 		if(e.tamanho[0] == 0){
 			e.ultimo_jogador = 4;
@@ -916,8 +905,12 @@ STATE joga_cpu (STATE e) {
 
 	if (e.ultimo_jogador==0) {
 		e.ultimo_jogador=1;
+		if(nroCartas(e.ultima_jogada) == 5){
+			e=jogaComb(e,130);
+		} else {
 		e=joga_cartas_cpu(e,130);
 		e.mao[1]=retira_cartas(e.mao[1],e.ultima_jogada);
+		}
 		e.tamanho[1]=nroCartas(e.mao[1]);
 		if(e.tamanho[1] == 0){
 			e.ultimo_jogador = 4;
@@ -926,8 +919,12 @@ STATE joga_cpu (STATE e) {
 
 	if (e.ultimo_jogador==1) {
 		e.ultimo_jogador=2;
+		if(nroCartas(e.ultima_jogada) == 5){
+			e=jogaComb(e,250);
+		} else {
 		e=joga_cartas_cpu(e,250);
 		e.mao[2]=retira_cartas(e.mao[2],e.ultima_jogada);
+		}
 		e.tamanho[2]=nroCartas(e.mao[2]);
 		if(e.tamanho[2] == 0){
 			e.ultimo_jogador = 4;
