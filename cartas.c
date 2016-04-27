@@ -482,6 +482,7 @@ int comparaFullHouse(MAO jogadaAnt, MAO jogadaAtual){
 			if(carta_existe(jogadaAnt, n, v)){
 				c ++; 
 			}
+			n++;
 		}
 		if(c == 3){
 			v1 = v;
@@ -495,6 +496,7 @@ int comparaFullHouse(MAO jogadaAnt, MAO jogadaAtual){
 			if(carta_existe(jogadaAtual, n, v)){
 				c ++; 
 			}
+			n++;
 		}
 		if(c == 3){
 			v2 = v;
@@ -747,10 +749,6 @@ MAO adiciona_cartas (MAO mao, MAO s) {
 	return mao;
 }
 
-
-
-
-
 MAO jogaFullHouse (MAO mao,MAO jogadaAnt) {
 	int n,v,n2,v2,j=0;
 	MAO temp=0;
@@ -785,10 +783,6 @@ MAO jogaFullHouse (MAO mao,MAO jogadaAnt) {
 	}
 	return 0;
 }
-
-
-
-
 
 STATE jogaComb(STATE e, int y){
 	MAO jogadaAjogar;
