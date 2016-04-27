@@ -810,7 +810,7 @@ STATE jogaComb(STATE e, int y){
 	if (jogadaAjogar==0) e.passar++;
 	else {
 		imprime_mao(500, y, e, jogadaAjogar, 4);
-		retira_cartas(e.mao[e.ultimo_jogador],jogadaAjogar);
+		e.mao[e.ultimo_jogador]=retira_cartas(e.mao[e.ultimo_jogador],jogadaAjogar);
 		e.ultima_jogada=jogadaAjogar;
 		e.passar=0;
 	}
@@ -922,25 +922,35 @@ Função encarrege de fazer os cpus jogar
 STATE joga_cpu (STATE e) {
 	if(e.ultimo_jogador == 3){
 		e.ultimo_jogador=0;
-		if(nroCartas(e.ultima_jogada) == 5){
-			e=jogaComb(e,10);
+		if (e.passar>=3){
+			e=joga_cartas_cpu(e,10);
+			e.mao[0]=retira_cartas(e.mao[0],e.ultima_jogada);
 		} else {
-		e=joga_cartas_cpu(e,10);
-		e.mao[0]=retira_cartas(e.mao[0],e.ultima_jogada);
+			if(nroCartas(e.ultima_jogada) == 5){
+				e=jogaComb(e,10);
+			} else {
+				e=joga_cartas_cpu(e,10);
+				e.mao[0]=retira_cartas(e.mao[0],e.ultima_jogada);
+			}
 		}
 		e.tamanho[0]=nroCartas(e.mao[0]);
 		if(e.tamanho[0] == 0){
-			e.ultimo_jogador = 4;
+		e.ultimo_jogador = 4;
 		} 
 	}
 
 	if (e.ultimo_jogador==0) {
 		e.ultimo_jogador=1;
-		if(nroCartas(e.ultima_jogada) == 5){
-			e=jogaComb(e,130);
+		if (e.passar>=3){
+			e=joga_cartas_cpu(e,130);
+			e.mao[1]=retira_cartas(e.mao[1],e.ultima_jogada);
 		} else {
-		e=joga_cartas_cpu(e,130);
-		e.mao[1]=retira_cartas(e.mao[1],e.ultima_jogada);
+			if(nroCartas(e.ultima_jogada) == 5){
+				e=jogaComb(e,130);
+			} else {
+				e=joga_cartas_cpu(e,130);
+				e.mao[1]=retira_cartas(e.mao[1],e.ultima_jogada);
+			}
 		}
 		e.tamanho[1]=nroCartas(e.mao[1]);
 		if(e.tamanho[1] == 0){
@@ -950,11 +960,16 @@ STATE joga_cpu (STATE e) {
 
 	if (e.ultimo_jogador==1) {
 		e.ultimo_jogador=2;
-		if(nroCartas(e.ultima_jogada) == 5){
-			e=jogaComb(e,250);
+		if (e.passar>=3){
+			e=joga_cartas_cpu(e,250);
+			e.mao[2]=retira_cartas(e.mao[2],e.ultima_jogada);
 		} else {
-		e=joga_cartas_cpu(e,250);
-		e.mao[2]=retira_cartas(e.mao[2],e.ultima_jogada);
+			if(nroCartas(e.ultima_jogada) == 5){
+				e=jogaComb(e,250);
+			} else {
+			e=joga_cartas_cpu(e,250);
+			e.mao[2]=retira_cartas(e.mao[2],e.ultima_jogada);
+			}
 		}
 		e.tamanho[2]=nroCartas(e.mao[2]);
 		if(e.tamanho[2] == 0){
