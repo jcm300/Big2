@@ -538,11 +538,9 @@ int identificaJogada(MAO jogada){
 			if(carta_existe(jogada, n, v)){
 				c = 1;
 				vt = v + 1;
-				while(c < 5){
-					if(carta_existe(jogada, n, vt)){
-						c ++;	
-						vt ++;
-					}
+				while(c < 5 && vt < 13){
+					if(carta_existe(jogada, n, vt)) c ++;	
+					vt ++;
 				}
 				if(vt == v+4)
 					return 3;
@@ -555,16 +553,15 @@ int identificaJogada(MAO jogada){
 			}
 		}
 	}	
-
+	
 	n1 = valor_existe(jogada, 11);
 	n2 = valor_existe(jogada, 12);
 	/*Identifica um straight*/
 	for(v = 0; v < 8; v ++){
 		if(valor_existe(jogada, v)){
-			n = 0;
 			vt = v + 1;
 			c = 1;
-			while(c < 5 && valor_existe(jogada, vt)){
+			while(c < 5 && valor_existe(jogada, vt) && vt < 13){
 					vt ++;
 					c ++;
 			}
@@ -611,7 +608,7 @@ int jogadaValida(MAO jogadaAnt, MAO jogadaAtual, int passar){
 				break;
 		}
 
-	} 
+	}
 	else if(!(cartasDiferentes(jogadaAtual))) return 0;	
 	else if(passar >=3) return 1;
 	else if(nroAnt == 0) return 1;
@@ -863,10 +860,8 @@ STATE joga_cartas_cpu (STATE e, int y) {
 /**
 Função encarregue de encontrar uma possível jogada para player
 */
-void sugereJogada (STATE e) {
+STATE sugereJogada (STATE e) {
 	int n, v;
-	int x = 10;
-	int y = 600;
 	int nro = nroCartas(e.ultima_jogada);
 	int nt;
 	MAO temp;
@@ -877,7 +872,7 @@ void sugereJogada (STATE e) {
 			if(carta_existe(e.mao[3], n, v)){
 				temp = add_carta(temp, n, v);
 				if(e.passar >= 3 || nro == 0){
-					imprime_mao(x,y,e,temp,v);
+					e.selecao=temp;
 					break;
 				}	
 				else if(comparaMaos(e.ultima_jogada, temp)){
@@ -888,13 +883,14 @@ void sugereJogada (STATE e) {
 						nt ++;			
 					 }
 					 if(nroCartas(temp) == nro){
-						imprime_mao(x, y, e, temp, v);
+						e.selecao=temp;
 						break;	
 					 }
 				}
 			}
 		}
 	}
+	return e;
 }
 
 
@@ -990,8 +986,8 @@ void imprime(STATE e) {
 		e = fim(e);
 		return ;
 	}
-	printf("<svg height = \"900\" width = \"1050\">\n");
-	printf("<rect x = \"0\" y = \"0\" height = \"900\" width = \"1050\" style = \"fill:#007700\"/>\n"); 
+	printf("<svg height = \"600\" width = \"1050\">\n");
+	printf("<rect x = \"0\" y = \"0\" height = \"600\" width = \"1050\" style = \"fill:#007700\"/>\n"); 
 
 	
 	if (e.tamanho[0]==13 && e.tamanho[1]==13 && e.tamanho[2]==13 && e.tamanho[3]==13) {
@@ -1003,7 +999,7 @@ void imprime(STATE e) {
 	}
 	
 	if(e.acao == 4){
-		sugereJogada (e); 
+		e=sugereJogada (e); 
 		e.acao = 0;
 	}
 
@@ -1069,9 +1065,7 @@ int main() {
 	printf("Content-Type: text/html; charset=utf-8\n\n");
 	printf("<header><title>Big Two</title></header>\n");
 	printf("<body>\n");
-		
-	printf("<h1>BIG TWO</h1>\n");
-	
+			
 	if(strlen(getenv("QUERY_STRING")) != 0){
     		e = str2estado(getenv("QUERY_STRING"));
     	}	
