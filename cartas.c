@@ -989,6 +989,7 @@ void imprime(STATE e) {
 	printf("<svg height = \"600\" width = \"1050\">\n");
 	printf("<rect x = \"0\" y = \"0\" height = \"600\" width = \"1050\" style = \"fill:#007700\"/>\n"); 
 
+	printf("<text x="900" y="10" fill="black">Big Two</text>\n");
 	
 	if (e.tamanho[0]==13 && e.tamanho[1]==13 && e.tamanho[2]==13 && e.tamanho[3]==13) {
 		e=joga_fst_cpu(e);
