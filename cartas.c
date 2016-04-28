@@ -583,6 +583,7 @@ int jogadaValida(MAO jogadaAnt, MAO jogadaAtual, int passar){
 	nroAg = nroCartas(jogadaAtual);
 
 	if(nroAg <= 0 || nroAg >5 || nroAg == 4) return 0;
+	else if(nroAg == 5 && nroAnt == 0 && identificaJogada(jogadaAtual)) return 1;
 	else if(nroAg == 5 && nroAg != nroAnt && passar < 3) return 0;
 	else if(nroAg == 5 && identificaJogada(jogadaAtual) && passar >= 3) return 1;
 	else if(nroAg == 5){
@@ -804,8 +805,10 @@ STATE jogaComb(STATE e, int y){
 			jogadaAjogar = 0;
 			break;
 	}
-	if (jogadaAjogar==0) e.passar++;
-	else {
+	if (jogadaAjogar==0) {
+		e.passar++;
+		printf("<text x=\"500\" y=\"%d\" fill=\"white\" font-size=\"20\">Passou</text>\n", y + 60);
+	} else {
 		imprime_mao(500, y, e, jogadaAjogar, 4);
 		e.mao[e.ultimo_jogador]=retira_cartas(e.mao[e.ultimo_jogador],jogadaAjogar);
 		e.ultima_jogada=jogadaAjogar;
@@ -854,6 +857,7 @@ STATE joga_cartas_cpu (STATE e, int y) {
 		}
 	}
 	e.passar += 1;
+	printf("<text x=\"500\" y=\"%d\" fill=\"white\" font-size=\"20\">Passou</text>\n", y + 60);
 	return e;
 }
 
@@ -894,6 +898,17 @@ STATE sugereJogada (STATE e) {
 }
 
 
+MAO joga5CPU(MAO ultima_jogada, MAO mao) {
+	MAO jogadaAjogar;
+	jogadaAjogar=jogaQuads(mao,ultima_jogada);
+	if (jogadaAjogar==0) jogadaAjogar=jogaFullHouse(mao,ultima_jogada);
+	if (jogadaAjogar==0) jogadaAjogar=jogaStraightFlush(mao,ultima_jogada);
+	if (jogadaAjogar==0) jogadaAjogar=jogaFlush(mao,ultima_jogada);
+	if (jogadaAjogar==0) jogadaAjogar=jogaStraight(mao,ultima_jogada);
+	return jogadaAjogar;
+}
+
+
 /**
 Se os cpus tiverem o 3 de ouros esta função joga o 3 de ouros
 */	
@@ -916,11 +931,22 @@ STATE joga_fst_cpu (STATE e) {
 Função encarrege de fazer os cpus jogar
 */
 STATE joga_cpu (STATE e) {
+	MAO jogadaAjogar;
+
 	if(e.ultimo_jogador == 3){
 		e.ultimo_jogador=0;
 		if (e.passar>=3){
-			e=joga_cartas_cpu(e,10);
-			e.mao[0]=retira_cartas(e.mao[0],e.ultima_jogada);
+			jogadaAjogar=joga5CPU(e.ultima_jogada,e.mao[e.ultimo_jogador]);
+			if (jogadaAjogar==0) {
+				e=joga_cartas_cpu(e,10); 
+				e.mao[0]=retira_cartas(e.mao[0],e.ultima_jogada);
+			}
+			else {
+			imprime_mao(500, 10, e, jogadaAjogar, 4);
+			e.mao[e.ultimo_jogador]=retira_cartas(e.mao[e.ultimo_jogador],jogadaAjogar);
+			e.ultima_jogada=jogadaAjogar;
+			e.passar=0;
+			}
 		} else {
 			if(nroCartas(e.ultima_jogada) == 5){
 				e=jogaComb(e,10);
@@ -938,8 +964,17 @@ STATE joga_cpu (STATE e) {
 	if (e.ultimo_jogador==0) {
 		e.ultimo_jogador=1;
 		if (e.passar>=3){
-			e=joga_cartas_cpu(e,130);
-			e.mao[1]=retira_cartas(e.mao[1],e.ultima_jogada);
+			jogadaAjogar=joga5CPU(e.ultima_jogada,e.mao[e.ultimo_jogador]);
+			if (jogadaAjogar==0) {
+				e=joga_cartas_cpu(e,130); 
+				e.mao[1]=retira_cartas(e.mao[1],e.ultima_jogada);
+			}
+			else {
+			imprime_mao(500, 130, e, jogadaAjogar, 4);
+			e.mao[e.ultimo_jogador]=retira_cartas(e.mao[e.ultimo_jogador],jogadaAjogar);
+			e.ultima_jogada=jogadaAjogar;
+			e.passar=0;
+			}
 		} else {
 			if(nroCartas(e.ultima_jogada) == 5){
 				e=jogaComb(e,130);
@@ -957,8 +992,17 @@ STATE joga_cpu (STATE e) {
 	if (e.ultimo_jogador==1) {
 		e.ultimo_jogador=2;
 		if (e.passar>=3){
-			e=joga_cartas_cpu(e,250);
-			e.mao[2]=retira_cartas(e.mao[2],e.ultima_jogada);
+			jogadaAjogar=joga5CPU(e.ultima_jogada,e.mao[e.ultimo_jogador]);
+			if (jogadaAjogar==0) {
+				e=joga_cartas_cpu(e,250); 
+				e.mao[2]=retira_cartas(e.mao[2],e.ultima_jogada);
+			}
+			else {
+			imprime_mao(500, 250, e, jogadaAjogar, 4);
+			e.mao[e.ultimo_jogador]=retira_cartas(e.mao[e.ultimo_jogador],jogadaAjogar);
+			e.ultima_jogada=jogadaAjogar;
+			e.passar=0;
+			}
 		} else {
 			if(nroCartas(e.ultima_jogada) == 5){
 				e=jogaComb(e,250);
@@ -989,7 +1033,7 @@ void imprime(STATE e) {
 	printf("<svg height = \"600\" width = \"1050\">\n");
 	printf("<rect x = \"0\" y = \"0\" height = \"600\" width = \"1050\" style = \"fill:#007700\"/>\n"); 
 
-	printf("<text x="900" y="10" fill="black">Big Two</text>\n");
+	printf("<text x=\"750\" y=\"75\" fill=\"black\" font-size=\"50\">Big Two</text>\n");
 	
 	if (e.tamanho[0]==13 && e.tamanho[1]==13 && e.tamanho[2]==13 && e.tamanho[3]==13) {
 		e=joga_fst_cpu(e);
@@ -1018,6 +1062,7 @@ void imprime(STATE e) {
 	
 	if (e.acao==2) {
 		e.passar++;
+		printf("<text x=\"500\" y=\"450\" fill=\"white\" font-size=\"20\">Passou</text>\n");
 		e.ultimo_jogador=3;
 		e.acao=0;
 		e=joga_cpu(e);
