@@ -767,28 +767,28 @@ STATE jogaComb(STATE e, int y){
 	switch(tjogada){
 		case 1:
 			jogadaAjogar=jogaQuads(e.mao[e.ultimo_jogador],e.ultima_jogada);
-			if (jogadaAjogar==0) jogadaAjogar=jogaStraightFlush(e.mao[e.ultimo_jogador],e.ultima_jogada);
+			if (jogadaAjogar==0) jogadaAjogar=jogaStraightFlush(e.mao[e.ultimo_jogador],0);
 			break;
 		case 2:
 			jogadaAjogar=jogaFullHouse(e.mao[e.ultimo_jogador],e.ultima_jogada);
-			if (jogadaAjogar==0) jogadaAjogar=jogaQuads(e.mao[e.ultimo_jogador],e.ultima_jogada);
-			if (jogadaAjogar==0) jogadaAjogar=jogaStraightFlush(e.mao[e.ultimo_jogador],e.ultima_jogada);
+			if (jogadaAjogar==0) jogadaAjogar=jogaQuads(e.mao[e.ultimo_jogador],0);
+			if (jogadaAjogar==0) jogadaAjogar=jogaStraightFlush(e.mao[e.ultimo_jogador],0);
 			break;
 		case 3:
 			jogadaAjogar=jogaStraightFlush(e.mao[e.ultimo_jogador],e.ultima_jogada);
 			break;
 		case 4:
 			jogadaAjogar=jogaFlush(e.mao[e.ultimo_jogador],e.ultima_jogada);
-			if (jogadaAjogar==0) jogadaAjogar=jogaFullHouse(e.mao[e.ultimo_jogador],e.ultima_jogada);
-			if (jogadaAjogar==0) jogadaAjogar=jogaQuads(e.mao[e.ultimo_jogador],e.ultima_jogada);
-			if (jogadaAjogar==0) jogadaAjogar=jogaStraightFlush(e.mao[e.ultimo_jogador],e.ultima_jogada);
+			if (jogadaAjogar==0) jogadaAjogar=jogaFullHouse(e.mao[e.ultimo_jogador],0);
+			if (jogadaAjogar==0) jogadaAjogar=jogaQuads(e.mao[e.ultimo_jogador],0);
+			if (jogadaAjogar==0) jogadaAjogar=jogaStraightFlush(e.mao[e.ultimo_jogador],0);
 			break;
 		case 5:
 			jogadaAjogar=jogaStraight(e.mao[e.ultimo_jogador],e.ultima_jogada);
-			if (jogadaAjogar==0) jogadaAjogar=jogaFlush(e.mao[e.ultimo_jogador],e.ultima_jogada);
-			if (jogadaAjogar==0) jogadaAjogar=jogaFullHouse(e.mao[e.ultimo_jogador],e.ultima_jogada);
-			if (jogadaAjogar==0) jogadaAjogar=jogaQuads(e.mao[e.ultimo_jogador],e.ultima_jogada);
-			if (jogadaAjogar==0) jogadaAjogar=jogaStraightFlush(e.mao[e.ultimo_jogador],e.ultima_jogada);
+			if (jogadaAjogar==0) jogadaAjogar=jogaFlush(e.mao[e.ultimo_jogador],0);
+			if (jogadaAjogar==0) jogadaAjogar=jogaFullHouse(e.mao[e.ultimo_jogador],0);
+			if (jogadaAjogar==0) jogadaAjogar=jogaQuads(e.mao[e.ultimo_jogador],0);
+			if (jogadaAjogar==0) jogadaAjogar=jogaStraightFlush(e.mao[e.ultimo_jogador],0);
 			break;
 		default:
 			jogadaAjogar = 0;
