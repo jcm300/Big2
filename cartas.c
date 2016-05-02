@@ -132,6 +132,31 @@ int existeValor (MAO mao, int v) {
 	return n;
 }
 
+/** Função que adiciona à primeira mão as cartas que estejam presentes na segunda mão*/
+MAO adiciona_cartas (MAO mao, MAO s) {
+	int n,v;
+	for(v = 0; v < 13; v++) {
+		for(n = 0; n < 4; n++)
+				if(carta_existe(s, n, v)) {
+					mao=add_carta(mao,n,v);
+			}
+	}	
+	return mao;
+}
+
+
+/** Função que retira da primeira mão as cartas que estejam presentes na segunda mão*/
+MAO retira_cartas (MAO mao, MAO s) {
+	int n,v;
+	for(v = 0; v < 13; v++) {
+		for(n = 0; n < 4; n++)
+				if(carta_existe(s, n, v)) {
+					mao=rem_carta(mao,n,v);
+				}
+	}	
+	return mao;
+}
+
 /**
 Função que distribui as cartas
 */
@@ -140,40 +165,20 @@ STATE distribuir(STATE e) {
 	Estado com todas as 52 cartas do baralho
 	*/
 	long long int ESTADO = 0xfffffffffffff;
-	int x,y,n;
+	int x,y, i;
 	srandom(time(NULL));
-	n=0;
-	while (n<13) {
-		x = random() % 4;
-		y = random() % 13;
-		if (carta_existe(ESTADO,x,y)) {
-			e.mao[0] = add_carta(e.mao[0],x,y);
-			ESTADO = rem_carta(ESTADO,x,y);
-			n++;
-			e.tamanho[0] += 1;
+	
+	for(i = 0; i < 3; i ++){
+		while (e.tamanho[i]<13){
+			x = random() % 4;
+			y = random() % 13;
+			if (carta_existe(ESTADO,x,y)) {
+				e.mao[i] = add_carta(e.mao[i],x,y);
+				ESTADO = rem_carta(ESTADO,x,y);
+				e.tamanho[i] += 1;
+			}
 		}
-	}
-	n=0;
-	while (n<13) {
-		x = random() % 4;
-		y = random() % 13;
-		if (carta_existe(ESTADO,x,y)) {
-			e.mao[1] = add_carta(e.mao[1],x,y);
-			ESTADO = rem_carta(ESTADO,x,y);
-			n++;
-			e.tamanho[1] += 1;
-		}
-	}
-	n=0;
-	while (n<13) {
-		x = random() % 4;
-		y = random() % 13;
-		if (carta_existe(ESTADO,x,y)) {
-		e.mao[2] = add_carta(e.mao[2],x,y);
-		ESTADO = rem_carta(ESTADO,x,y);
-		n ++;
-		e.tamanho[2] += 1;
-		}
+		//ESTADO = retira_cartas(ESTADO ,e.mao[i]);
 	}
 	e.mao[3] = ESTADO;
 	e.tamanho[3] = 13;
@@ -347,7 +352,7 @@ STATE fim(STATE e){
 	return e;
 }
 
-int comparaMaos2(MAO jogadaAnt, MAO jogadaAtual){
+int comparaFlush(MAO jogadaAnt, MAO jogadaAtual){
 	int c  = 0, v1 = 0, v2 = 0, n1 = 0, n2 = 0;
 
 	while(jogadaAnt > 0){
@@ -583,32 +588,30 @@ int jogadaValida(MAO jogadaAnt, MAO jogadaAtual, int passar){
 	nroAg = nroCartas(jogadaAtual);
 
 	if(nroAg <= 0 || nroAg >5 || nroAg == 4) return 0;
-	else if(nroAg == 5 && nroAnt == 0 && identificaJogada(jogadaAtual)) return 1;
-	else if(nroAg == 5 && nroAg != nroAnt && passar < 3) return 0;
-	else if(nroAg == 5 && identificaJogada(jogadaAtual) && passar >= 3) return 1;
-	else if(nroAg == 5){
-		if(identificaJogada(jogadaAtual) != identificaJogada(jogadaAnt)) return 0;
-		switch(identificaJogada(jogadaAtual)){
-			case 1: 
-				return comparaQuads(jogadaAnt, jogadaAtual);
-				break;
-			case 2: 
-				return comparaFullHouse(jogadaAnt, jogadaAtual);
-				break;
-			case 3: 
-				return comparaStrEStrFlush(jogadaAtual, jogadaAnt);
-				break;
-			case 4: 
-				return comparaMaos2(jogadaAnt, jogadaAtual);
-				break;
-			case 5: 
-				return comparaStrEStrFlush(jogadaAtual, jogadaAnt);
-				break;
-			default:
-				return 0;
-				break;
+	else if(nroAg == 5){ 
+		if(nroAnt == 0 && identificaJogada(jogadaAtual)) return 1;
+	    else if(nroAg != nroAnt && passar < 3) return 0;
+	    else if(identificaJogada(jogadaAtual) && passar >= 3) return 1;
+		else{
+			if(identificaJogada(jogadaAtual) != identificaJogada(jogadaAnt)) return 0;
+			switch(identificaJogada(jogadaAtual)){
+				case 1: 
+					return comparaQuads(jogadaAnt, jogadaAtual);
+					break;
+				case 2: 
+					return comparaFullHouse(jogadaAnt, jogadaAtual);
+					break;
+				case 4: 
+					return comparaFlush(jogadaAnt, jogadaAtual);
+					break;
+				case 0: 
+					return 0;
+					break;
+				default:		
+					return comparaStrEStrFlush(jogadaAtual, jogadaAnt);
+					break;
+			}
 		}
-
 	}
 	else if(!(cartasDiferentes(jogadaAtual))) return 0;	
 	else if(passar >=3) return 1;
@@ -616,19 +619,6 @@ int jogadaValida(MAO jogadaAnt, MAO jogadaAtual, int passar){
 	else if(nroAnt != nroAg) return 0;
 	else if(comparaMaos(jogadaAnt, jogadaAtual)) return 1;
 	else return 0;
-}
-
-
-/** Função que retira as cartas de uma mão caso já esteja presente na seleção*/
-MAO retira_cartas (MAO mao, MAO s) {
-	int n,v;
-	for(v = 0; v < 13; v++) {
-		for(n = 0; n < 4; n++)
-				if(carta_existe(s, n, v)) {
-					mao=rem_carta(mao,n,v);
-			}
-	}	
-	return mao;
 }
 
 
@@ -728,23 +718,12 @@ MAO jogaFlush (MAO mao, MAO jogadaAnt) {
 				j++;
 				temp=add_carta(temp,n,v);
 			}
-			if (comparaMaos2(jogadaAnt,temp) && j==5) {
+			if (comparaFlush(jogadaAnt,temp) && j==5) {
 				return temp;
 			}
 		}
 	}
 	return 0;
-}
-
-MAO adiciona_cartas (MAO mao, MAO s) {
-	int n,v;
-	for(v = 0; v < 13; v++) {
-		for(n = 0; n < 4; n++)
-				if(carta_existe(s, n, v)) {
-					mao=add_carta(mao,n,v);
-			}
-	}	
-	return mao;
 }
 
 MAO jogaFullHouse (MAO mao,MAO jogadaAnt) {
@@ -805,7 +784,7 @@ STATE jogaComb(STATE e, int y){
 			jogadaAjogar = 0;
 			break;
 	}
-	if (jogadaAjogar==0) {
+	if (!(jogadaAjogar)) {
 		e.passar++;
 		printf("<text x=\"500\" y=\"%d\" fill=\"white\" font-size=\"20\">Passou</text>\n", y + 60);
 	} else {
@@ -864,7 +843,7 @@ STATE joga_cartas_cpu (STATE e, int y) {
 /**
 Função encarregue de encontrar uma possível jogada para player
 */
-STATE sugereJogada (STATE e) {
+STATE sugereDuTri (STATE e) {
 	int n, v;
 	int nro = nroCartas(e.ultima_jogada);
 	int nt;
@@ -877,6 +856,7 @@ STATE sugereJogada (STATE e) {
 				temp = add_carta(temp, n, v);
 				if(e.passar >= 3 || nro == 0){
 					e.selecao=temp;
+					n = 4;
 					break;
 				}	
 				else if(comparaMaos(e.ultima_jogada, temp)){
@@ -888,12 +868,46 @@ STATE sugereJogada (STATE e) {
 					 }
 					 if(nroCartas(temp) == nro){
 						e.selecao=temp;
+						n = 4;
 						break;	
 					 }
 				}
 			}
 		}
 	}
+	if(!temp)printf("<text x=\"500\" y=\"450\" fill=\"white\" font-size=\"20\">Não há jogada possível</text>\n");
+	return e;
+}
+
+STATE sugereComb(STATE e){
+	MAO jogadaAjogar;
+	
+	switch(identificaJogada(e.ultima_jogada)){
+		case 1: jogadaAjogar = jogaQuads(e.mao[3], e.ultima_jogada);
+				break;
+		case 2:	jogadaAjogar = jogaFullHouse(e.mao[3], e.ultima_jogada);
+				break;
+		case 3: jogadaAjogar = jogaStraightFlush(e.mao[3], e.ultima_jogada);
+				break;
+		case 4: jogadaAjogar = jogaFlush(e.mao[3], e.ultima_jogada);
+				break;
+		default:jogadaAjogar = jogaStraight(e.mao[3], e.ultima_jogada); 
+				break;
+	} 
+	if(jogadaAjogar != 0){
+		e.selecao = jogadaAjogar;
+	}else if(e.passar < 3) printf("<text x=\"500\" y=\"450\" fill=\"white\" font-size=\"20\">Não há jogada possível</text>\n");
+	return e;
+}
+
+STATE sugereJogada(STATE e){
+	if(e.passar >=3){
+		e = sugereComb(e);
+		if(e.selecao == 0) e = sugereDuTri(e);
+	}
+	if(nroCartas(e.ultima_jogada) == 5) e = sugereComb(e);
+	else e =sugereDuTri(e);
+	
 	return e;
 }
 
@@ -906,6 +920,28 @@ MAO joga5CPU(MAO ultima_jogada, MAO mao) {
 	if (jogadaAjogar==0) jogadaAjogar=jogaFlush(mao,ultima_jogada);
 	if (jogadaAjogar==0) jogadaAjogar=jogaStraight(mao,ultima_jogada);
 	return jogadaAjogar;
+}
+
+MAO jogaDuTri(MAO mao){
+	int v, n, c;
+	MAO jogada;
+	
+	for(v = 0; v < 13; v ++){
+		if(valor_existe(mao, v)){
+			jogada = 0x000000000000;
+			c = n = 0;
+			while(c < 3 && n < 4){
+				if(carta_existe(mao, n, v)){
+				jogada = add_carta(jogada, n, v);
+					c ++;
+				}
+				n ++;
+			}
+			if(c >= 2)
+				return jogada; 
+		}
+	}
+	return 0;	
 }
 
 
@@ -937,15 +973,24 @@ STATE joga_cpu (STATE e) {
 		e.ultimo_jogador=0;
 		if (e.passar>=3){
 			jogadaAjogar=joga5CPU(e.ultima_jogada,e.mao[e.ultimo_jogador]);
-			if (jogadaAjogar==0) {
-				e=joga_cartas_cpu(e,10); 
-				e.mao[0]=retira_cartas(e.mao[0],e.ultima_jogada);
+			if (jogadaAjogar==0){
+				jogadaAjogar = jogaDuTri(e.mao[e.ultimo_jogador]);
+				if(jogadaAjogar==0){
+					e = joga_cartas_cpu(e, 10);
+					e.mao[e.ultimo_jogador] = retira_cartas(e.mao[0], e.ultima_jogada);
+				}
+				else{
+					e.ultima_jogada = jogadaAjogar;
+					e.mao[0] = retira_cartas(e.mao[0], e.ultima_jogada);
+					imprime_mao(500, 10, e, e.ultima_jogada, 4);
+					e.passar = 0;
+				}
 			}
 			else {
-			imprime_mao(500, 10, e, jogadaAjogar, 4);
-			e.mao[e.ultimo_jogador]=retira_cartas(e.mao[e.ultimo_jogador],jogadaAjogar);
-			e.ultima_jogada=jogadaAjogar;
-			e.passar=0;
+				imprime_mao(500, 10, e, jogadaAjogar, 4);
+				e.mao[e.ultimo_jogador]=retira_cartas(e.mao[e.ultimo_jogador],jogadaAjogar);
+				e.ultima_jogada=jogadaAjogar;
+				e.passar=0;
 			}
 		} else {
 			if(nroCartas(e.ultima_jogada) == 5){
@@ -957,7 +1002,7 @@ STATE joga_cpu (STATE e) {
 		}
 		e.tamanho[0]=nroCartas(e.mao[0]);
 		if(e.tamanho[0] == 0){
-		e.ultimo_jogador = 4;
+			e.ultimo_jogador = 4;
 		} 
 	}
 
@@ -965,9 +1010,18 @@ STATE joga_cpu (STATE e) {
 		e.ultimo_jogador=1;
 		if (e.passar>=3){
 			jogadaAjogar=joga5CPU(e.ultima_jogada,e.mao[e.ultimo_jogador]);
-			if (jogadaAjogar==0) {
-				e=joga_cartas_cpu(e,130); 
-				e.mao[1]=retira_cartas(e.mao[1],e.ultima_jogada);
+			if (jogadaAjogar==0){
+				jogadaAjogar = jogaDuTri(e.mao[e.ultimo_jogador]);
+				if(jogadaAjogar==0){
+					e = joga_cartas_cpu(e, 130);
+					e.mao[e.ultimo_jogador] = retira_cartas(e.mao[1], e.ultima_jogada);
+				}
+				else{
+					e.ultima_jogada = jogadaAjogar;
+					e.mao[1] = retira_cartas(e.mao[1], e.ultima_jogada);
+					imprime_mao(500, 130, e, e.ultima_jogada, 4);
+					e.passar = 0;
+				}
 			}
 			else {
 			imprime_mao(500, 130, e, jogadaAjogar, 4);
@@ -993,9 +1047,18 @@ STATE joga_cpu (STATE e) {
 		e.ultimo_jogador=2;
 		if (e.passar>=3){
 			jogadaAjogar=joga5CPU(e.ultima_jogada,e.mao[e.ultimo_jogador]);
-			if (jogadaAjogar==0) {
-				e=joga_cartas_cpu(e,250); 
-				e.mao[2]=retira_cartas(e.mao[2],e.ultima_jogada);
+			if (jogadaAjogar==0){
+				jogadaAjogar = jogaDuTri(e.mao[e.ultimo_jogador]);
+				if(jogadaAjogar==0){
+					e = joga_cartas_cpu(e, 250);
+					e.mao[e.ultimo_jogador] = retira_cartas(e.mao[2], e.ultima_jogada);
+				}
+				else{
+					e.ultima_jogada = jogadaAjogar;
+					e.mao[2] = retira_cartas(e.mao[2], e.ultima_jogada);
+					imprime_mao(500, 250, e, e.ultima_jogada, 4);
+					e.passar = 0;
+				}
 			}
 			else {
 			imprime_mao(500, 250, e, jogadaAjogar, 4);
@@ -1035,6 +1098,7 @@ void imprime(STATE e) {
 
 	printf("<text x=\"750\" y=\"75\" fill=\"black\" font-size=\"50\">Big Two</text>\n");
 	
+	
 	if (e.tamanho[0]==13 && e.tamanho[1]==13 && e.tamanho[2]==13 && e.tamanho[3]==13) {
 		e=joga_fst_cpu(e);
 		if(e.ultimo_jogador == 3){
@@ -1057,7 +1121,8 @@ void imprime(STATE e) {
 		e.acao=0;
 		imprime_mao(500,390,e,e.selecao,4);
 		e.selecao=0;
-		e=joga_cpu(e);
+		if(e.tamanho[3] != 0) 
+			e=joga_cpu(e);
 	}
 	
 	if (e.acao==2) {
@@ -1072,7 +1137,7 @@ void imprime(STATE e) {
 	imprime_mao(10,130,e,e.mao[1],1);
 	imprime_mao(10,250,e,e.mao[2],2);
 	imprime_mao(10,390,e,e.mao[3],3);
-	
+
 	jv=jogadaValida(e.ultima_jogada, e.selecao,e.passar);
 	imprime_butoes(40,510,e,jv);
 
