@@ -454,16 +454,16 @@ int comparaQuads(MAO jogadaAnt, MAO jogadaAtual){
 
 int comparaStrEStrFlush(MAO jogadaAtual, MAO jogadaAnt){
 	int n1,n2;
-	n1=existeValor(jogadaAtual,11);
-	n2=existeValor(jogadaAtual,12);
-	if(n2!=4) {
-		if (n1!=4) jogadaAtual=rem_carta(jogadaAtual,n1,11);
+	n1=valor_existe(jogadaAtual,11);
+	n2=valor_existe(jogadaAtual,12);
+	if(n2) {
+		if (n1) jogadaAtual=rem_carta(jogadaAtual,n1,11);
 		jogadaAtual=rem_carta(jogadaAtual,n2,12);
 	} 
-	n1=existeValor(jogadaAnt,11);
-	n2=existeValor(jogadaAnt,12);
-	if(n2!=4) {
-		if (n1!=4) jogadaAnt=rem_carta(jogadaAnt,n1,11);
+	n1=valor_existe(jogadaAnt,11);
+	n2=valor_existe(jogadaAnt,12);
+	if(n2) {
+		if (n1) jogadaAnt=rem_carta(jogadaAnt,n1,11);
 		jogadaAnt=rem_carta(jogadaAnt,n2,12);
 	}
 	return (comparaMaos(jogadaAnt,jogadaAtual));
@@ -792,11 +792,8 @@ STATE jogaComb(STATE e, int y){
 			if (jogadaAjogar==0) jogadaAjogar=jogaQuads(e.mao[e.ultimo_jogador],0);
 			if (jogadaAjogar==0) jogadaAjogar=jogaStraightFlush(e.mao[e.ultimo_jogador],0);
 			break;
-		default:
-			jogadaAjogar = 0;
-			break;
 	}
-	if (!(jogadaAjogar)) {
+	if (jogadaAjogar == 0) {
 		e.passar++;
 		printf("<text x=\"500\" y=\"%d\" fill=\"white\" font-size=\"20\">Passou</text>\n", y + 60);
 	} else {
