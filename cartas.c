@@ -586,29 +586,39 @@ int jogadaValida(MAO jogadaAnt, MAO jogadaAtual, int passar){
 	int nroAg, nroAnt;
 	nroAnt = nroCartas(jogadaAnt);
 	nroAg = nroCartas(jogadaAtual);
+	int tipo = identificaJogada(jogadaAnt);
 
 	if(nroAg <= 0 || nroAg >5 || nroAg == 4) return 0;
 	else if(nroAg == 5){ 
 		if(nroAnt == 0 && identificaJogada(jogadaAtual)) return 1;
-	    else if(nroAg != nroAnt && passar < 3) return 0;
-	    else if(identificaJogada(jogadaAtual) && passar >= 3) return 1;
+		else if(nroAg != nroAnt && passar < 3) return 0;
+		else if(identificaJogada(jogadaAtual) && passar >= 3) return 1;
 		else{
-			if(identificaJogada(jogadaAtual) != identificaJogada(jogadaAnt)) return 0;
 			switch(identificaJogada(jogadaAtual)){
 				case 1: 
-					return comparaQuads(jogadaAnt, jogadaAtual);
+					if(tipo == 3) return 0;
+					else if(tipo == 1) return comparaQuads(jogadaAnt, jogadaAtual);
+					else return 1;
 					break;
 				case 2: 
-					return comparaFullHouse(jogadaAnt, jogadaAtual);
+					if(tipo == 5 || tipo ==4) return 1; 
+					else if(tipo == 2) return comparaFullHouse(jogadaAnt, jogadaAtual);
+					else return 0;
 					break;
-				case 4: 
-					return comparaFlush(jogadaAnt, jogadaAtual);
+				case 3:
+					if(tipo != 3) return 1;
+					else return comparaStrEStrFlush(jogadaAtual, jogadaAnt);
 					break;
-				case 0: 
-					return 0;
+				case 4:
+					if(tipo == 5) return 1; 
+					else if(tipo == 4) return comparaFlush(jogadaAnt, jogadaAtual);
+					else return 0;
+					break;
+				case 5:	if(tipo == 5) return comparaStrEStrFlush(jogadaAtual, jogadaAnt);
+					else return 0;
 					break;
 				default:		
-					return comparaStrEStrFlush(jogadaAtual, jogadaAnt);
+					return 0;
 					break;
 			}
 		}
@@ -891,18 +901,29 @@ STATE sugereDuTri (STATE e) {
 
 STATE sugereComb(STATE e){
 	MAO jogadaAjogar;
+	MAO  temp = 0x0000000000000;
 	
 	switch(identificaJogada(e.ultima_jogada)){
 		case 1: jogadaAjogar = jogaQuads(e.mao[3], e.ultima_jogada);
-				break;
+			if(jogadaAjogar == 0) jogadaAjogar = jogaStraightFlush(e.mao[3], temp);
+			break;
 		case 2:	jogadaAjogar = jogaFullHouse(e.mao[3], e.ultima_jogada);
-				break;
+			if(jogadaAjogar == 0) jogadaAjogar = jogaQuads(e.mao[3], temp);
+			if(jogadaAjogar == 0) jogadaAjogar = jogaStraightFlush(e.mao[3], temp);
+			break;
 		case 3: jogadaAjogar = jogaStraightFlush(e.mao[3], e.ultima_jogada);
-				break;
+			break;
 		case 4: jogadaAjogar = jogaFlush(e.mao[3], e.ultima_jogada);
-				break;
+			if(jogadaAjogar == 0) jogadaAjogar = jogaQuads(e.mao[3], temp);
+			if(jogadaAjogar == 0) jogadaAjogar = jogaStraightFlush(e.mao[3], temp);
+			if(jogadaAjogar == 0) jogadaAjogar = jogaFullHouse(e.mao[3], temp);
+			break;
 		default:jogadaAjogar = jogaStraight(e.mao[3], e.ultima_jogada); 
-				break;
+			if(jogadaAjogar == 0) jogadaAjogar = jogaFlush(e.mao[3], temp);
+			if(jogadaAjogar == 0) jogadaAjogar = jogaQuads(e.mao[3], temp);
+			if(jogadaAjogar == 0) jogadaAjogar = jogaStraightFlush(e.mao[3], temp);
+			if(jogadaAjogar == 0) jogadaAjogar = jogaFullHouse(e.mao[3], temp);
+			break;
 	} 
 	if(jogadaAjogar != 0){
 		e.selecao = jogadaAjogar;
