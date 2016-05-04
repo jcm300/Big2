@@ -310,16 +310,17 @@ void imprime_butoes(int x, int y, STATE e, int jv){
 */
 STATE fim(STATE e){
 
-	int x = 10;
-	int y = 10;
+	int x = 800;
+	int y = 80;
 	int i;
 	char script[10240];	
-	char *tabs="&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"; 
 
-	printf("<h2>Pontuações</h2>\n");
-	for(i = 0; i < 3; i ++){
+	printf("<rect x = \"750\" y = \"0\" height = \"600\" width = \"300\" style = \"fill:#007700\"/>\n"); 
+	printf("<text x=\"775\" y=\"40\" fill=\"black\" font-size=\"35\">Pontuações</text>\n");
+	for(i = 0; i < 4; i ++, y += 120){
 		if(e.tamanho[i] == 0)
-			printf("<p>%d  %s%s Winner(%d)</p>\n", i+1, tabs, tabs,e.pontos[i]);
+			printf("<text x=\"%d\" y=\"%d\" fill=\"black\" font-size=\"25\">Winner (%d) </text>\n", x, y , e.pontos[i]);
+			//printf("<p>%d  %s%s Winner(%d)</p>\n", i+1, tabs, tabs,e.pontos[i]);
 		else{
 			if(e.tamanho[i] <= 9 && e.tamanho[i] > 0)
 				e.pontos[i] += -e.tamanho[i];
@@ -327,28 +328,19 @@ STATE fim(STATE e){
 				e.pontos[i] += (-2)*e.tamanho[i];
 			else if(e.tamanho[i] == 13)
 				e.pontos[i] += (-3)* e.tamanho[i];
-			printf("<p>%d %s%s %d\n</p>\n", i+1, tabs, tabs,e.pontos[i]);
+			printf("<text x=\"%d\" y=\"%d\" fill=\"black\" font-size=\"25\"> %d </text>\n", x+30, y , e.pontos[i]);
+			//printf("<p>%d %s%s %d\n</p>\n", i+1, tabs, tabs,e.pontos[i]);
 		}
 	}
-	if(e.tamanho[i] != 0){
-		if(e.tamanho[i] <= 9 && e.tamanho[i] > 0)
-			e.pontos[i] += -e.tamanho[i];
-		else if(e.tamanho[i] >= 10 && e.tamanho[i] <= 12)
-			e.pontos[i] += (-2)*e.tamanho[i];
-		else if(e.tamanho[i] == 13)
-			e.pontos[i] += (-3)* e.tamanho[i];
-		printf("<p>Jogador %s %d\n</p>\n", tabs,  e.pontos[i]);
-	}
-	else printf("<p>Jogador %s Winner</p>\n", tabs );
-	printf("<svg height = \"120\" width = \"500\">\n");
-	printf("<rect x = \"0\" y = \"0\" height = \"120\" width = \"100\" style = \"fill:#f3f4f5\"/>\n"); 
+	
+	
+	y -= 75;
 	e.acao=1;
 	sprintf(script, "%s?%s", SCRIPT, estado2str(e));
-	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/baralhar.png\" /></a>\n", script, x, y, BOTOES);
+	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/baralhar.png\" /></a>\n", script, x-25, y, BOTOES);
 	e.acao=5;
 	sprintf(script, "%s?%s", SCRIPT, estado2str(e));
-	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/NovoJogo.png\" /></a>\n", script, x+100, y, BOTOES);
-	printf("</svg>\n");
+	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/NovoJogo.png\" /></a>\n", script, x+75, y, BOTOES);
 	return e;
 }
 
@@ -1119,11 +1111,7 @@ Esta função está encarregue de imprimir o estado do jogo tendo em conta certo
 void imprime(STATE e) {
 	int jv;
 	
-	if (e.tamanho[0]==0 || e.tamanho[1]==0 || e.tamanho[2]==0 || e.tamanho[3]==0) {
-		e.acao = 10;
-		e = fim(e);
-		return ;
-	}
+	
 	printf("<svg height = \"600\" width = \"1050\">\n");
 	printf("<rect x = \"0\" y = \"0\" height = \"600\" width = \"1050\" style = \"fill:#007700\"/>\n"); 
 
@@ -1172,8 +1160,13 @@ void imprime(STATE e) {
 	jv=jogadaValida(e.ultima_jogada, e.selecao,e.passar);
 	imprime_butoes(40,510,e,jv);
 
-	printf("</svg>\n");
+	if (!(e.tamanho[0] && e.tamanho[1] && e.tamanho[2] && e.tamanho[3])) {
+		e.acao = 10;
+		e = fim(e);
+		return ;
+	}
 	
+	printf("</svg>\n");
 }
 /**
 Função encarregue de distribuir as cartas, caso estas não tenham sido já distribuídas, e de chamar a funçao que faz o jogo "correr"
