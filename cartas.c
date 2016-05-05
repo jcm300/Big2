@@ -299,15 +299,17 @@ void imprime_butoes(int x, int y, STATE e, int jv){
 	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/Ordenar.png\" /></a>\n", script, x +400, y, BOTOES);
 }
 
-/*void novoJogo(STATE *e){
+void novoJogo(STATE *e){
+	int i;
+
 	for (i=0;i<4;i++) {
-		e.mao[i]=0;
-		e.tamanho[i]=0;
+		e->mao[i]=0;
+		e->tamanho[i]=0;
 	}
-	e.acao=e.ultimo_jogador=e.passar=0;
-	e.selecao=e.ultima_jogada=0;
+	e->acao=e->ultimo_jogador=e->passar=0;
+	e->selecao=e->ultima_jogada=0;
 }
-*/
+
 STATE fim(STATE e){
 
 	int x = 800;
@@ -764,7 +766,7 @@ MAO jogaFullHouse (MAO mao,MAO jogadaAnt) {
 }
 
 STATE jogaComb(STATE e, int y){
-	MAO jogadaAjogar;
+	MAO jogadaAjogar  = 0x0000000000000;
 	int tjogada = identificaJogada(e.ultima_jogada);
 	switch(tjogada){
 		case 1:
@@ -1154,15 +1156,17 @@ void imprime(STATE e) {
 	imprime_mao(10,250,e,e.mao[2],2);
 	imprime_mao(10,390,e,e.mao[3],3);
 
-	jv=jogadaValida(e.ultima_jogada, e.selecao,e.passar);
-	imprime_butoes(40,510,e,jv);
-
 	if (!(e.tamanho[0] && e.tamanho[1] && e.tamanho[2] && e.tamanho[3])) {
 		e.acao = 10;
 		e = fim(e);
+		printf("</svg>\n");
 		return ;
 	}
 	
+	jv=jogadaValida(e.ultima_jogada, e.selecao,e.passar);
+	imprime_butoes(40,510,e,jv);
+
+
 	printf("</svg>\n");
 }
 /**
@@ -1210,13 +1214,14 @@ int main() {
 		e.selecao=e.ultima_jogada=0;
 	}
 	else if(e.acao == 5){
-		for (i=0;i<4;i++) {
+		novoJogo(&e);
+		/*for (i=0;i<4;i++) {
 	    		e.mao[i]=0;
     			e.tamanho[i]=0;
 			e.pontos[i]=0;
 		}
 		e.acao=e.ultimo_jogador=e.passar=0;
-		e.selecao=e.ultima_jogada=0;
+		e.selecao=e.ultima_jogada=0;*/
 	}
 	parse(e);
 
