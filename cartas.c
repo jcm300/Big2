@@ -323,17 +323,6 @@ void imprime_butoes(int x, int y, STATE e, int jv){
 	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/Ordenar.png\" /></a>\n", script, x +400, y, BOTOES);
 }
 
-void novoJogo(STATE *e){
-	int i;
-
-	for (i=0;i<4;i++) {
-		e->mao[i]=0;
-		e->tamanho[i]=0;
-	}
-	e->acao=e->ultimo_jogador=e->passar=0;
-	e->selecao=e->ultima_jogada=0;
-}
-
 STATE fim(STATE e){
 
 	int x = 800;
@@ -1214,8 +1203,22 @@ void parse(STATE e) {
 	if(e.mao[0] == 0 && e.acao == 0) {
 		e=distribuir(e);
 	}
-
+	e.tamanho[0]=nroCartas(e.mao[0]);
+	e.tamanho[1]=nroCartas(e.mao[1]);
+	e.tamanho[2]=nroCartas(e.mao[2]);
+	e.tamanho[3]=nroCartas(e.mao[3]);
 	imprime(e);
+}
+
+void novoJogo(STATE *e){
+	int i;
+
+	for (i=0;i<4;i++) {
+		e->mao[i]=0;
+		e->tamanho[i]=0;
+	}
+	e->acao=e->ultimo_jogador=e->passar=0;
+	e->selecao=e->ultima_jogada=0;
 }
 
 /**
