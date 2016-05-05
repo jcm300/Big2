@@ -349,6 +349,8 @@ STATE fim(STATE e){
 int comparaFlush(MAO jogadaAnt, MAO jogadaAtual){
 	int c  = 0, v1 = 0, v2 = 0, n1 = 0, n2 = 0;
 
+	if(jogadaAnt == 0) return 1;
+
 	while(jogadaAnt > 0){
 		if(c > 12){
 			c = 0;
@@ -381,6 +383,8 @@ Compara duas mãos por forma a validar a jogadaAtual em relação a jogadaAnt
 */
 int comparaMaos(MAO jogadaAnt, MAO jogadaAtual){
 	int c  = 0, v1 = 0, v2 = 0, n1 = 0, n2 = 0;
+
+	if(jogadaAnt == 0) return 1;
 
 	while(jogadaAnt > 0){
 		if(c > 12){
@@ -433,7 +437,9 @@ int cartasDiferentes(MAO jogadaAtual){
 
 int comparaQuads(MAO jogadaAnt, MAO jogadaAtual){
 	int v  = 0, v1 = 0, v2 = 0;
-
+	
+	if(jogadaAnt == 0) return 1;
+	
 	for(v = 0; v < 13; v ++){
 		if(carta_existe(jogadaAnt, 0, v)){
 			if(carta_existe(jogadaAnt, 1, v)){
@@ -456,6 +462,7 @@ int comparaQuads(MAO jogadaAnt, MAO jogadaAtual){
 
 int comparaStrEStrFlush(MAO jogadaAtual, MAO jogadaAnt){
 	int n1,n2;
+	if(jogadaAnt == 0) return 1;
 	n1=valor_existe(jogadaAtual,11);
 	n2=valor_existe(jogadaAtual,12);
 	if(n2) {
@@ -474,7 +481,8 @@ int comparaStrEStrFlush(MAO jogadaAtual, MAO jogadaAnt){
 int comparaFullHouse(MAO jogadaAnt, MAO jogadaAtual){
 	int v = 0, v1 = 0, v2 = 0, c, n;
 	
-	
+	if(jogadaAnt == 0) return 1;	
+ 
 	for(v = 0; v < 13; v ++){
 		n = c = 0;
 		while(n<4){
@@ -734,7 +742,7 @@ MAO jogaFullHouse (MAO mao,MAO jogadaAnt) {
 	int n,v,n2,v2,j=0;
 	MAO temp=0;
 	MAO temp2=0;
-	if (nroCartas(mao)<5) return 0;
+	//if (nroCartas(mao)<5) return 0;
 	for(v = 0; v < 13; v ++){
 		j=0;
 		temp=0;
@@ -934,13 +942,13 @@ STATE sugereJogada(STATE e){
 }
 
 
-MAO joga5CPU(MAO ultima_jogada, MAO mao) {
+MAO joga5CPU(MAO ultima_jogada, MAO mao, int fst) {
 	MAO jogadaAjogar;
 	jogadaAjogar=jogaStraight(mao,ultima_jogada);
-	if (jogadaAjogar==0) jogadaAjogar=jogaFlush(mao,ultima_jogada);
-	if (jogadaAjogar==0) jogadaAjogar=jogaFullHouse(mao,ultima_jogada);
-	if (jogadaAjogar==0) jogadaAjogar=jogaQuads(mao,ultima_jogada);
-	if (jogadaAjogar==0) jogadaAjogar=jogaStraightFlush(mao,ultima_jogada);
+	if (jogadaAjogar==0 || (!carta_existe(jogadaAjogar, 0, 0) && fst)) jogadaAjogar=jogaFlush(mao,ultima_jogada);
+	if (jogadaAjogar==0 || (!carta_existe(jogadaAjogar, 0, 0) && fst)) jogadaAjogar=jogaFullHouse(mao,ultima_jogada);
+	if (jogadaAjogar==0 || (!carta_existe(jogadaAjogar, 0, 0) && fst)) jogadaAjogar=jogaQuads(mao,ultima_jogada);
+	if (jogadaAjogar==0 || (!carta_existe(jogadaAjogar, 0, 0) && fst)) jogadaAjogar=jogaStraightFlush(mao,ultima_jogada);
 	return jogadaAjogar;
 }
 
@@ -972,10 +980,18 @@ Se os cpus tiverem o 3 de ouros esta função joga o 3 de ouros
 */	
 STATE joga_fst_cpu (STATE e) {
 	int y,i;
+	MAO jogadaAjogar;
 	for (y=10, i=0; i<3; i++, y+=120) {
 		if (carta_existe(e.mao[i],0,0)) {
-			imprime_carta(530,y,e,0,0);
-			e.ultima_jogada=add_carta(e.ultima_jogada,0,0);
+			jogadaAjogar = joga5CPU(0, e.mao[i], 1);
+			if(jogadaAjogar){
+				imprime_mao(500, 10 + i * 120, e, jogadaAjogar, 4);
+				e.ultima_jogada= jogadaAjogar;
+							}
+			else{
+				imprime_carta(530,y,e,0,0);
+				e.ultima_jogada=add_carta(e.ultima_jogada,0,0);
+			}
 			break;
 		}
 	}
@@ -994,7 +1010,7 @@ STATE joga_cpu (STATE e) {
 	if(e.ultimo_jogador == 3){
 		e.ultimo_jogador=0;
 		if (e.passar>=3){
-			jogadaAjogar=joga5CPU(e.ultima_jogada,e.mao[e.ultimo_jogador]);
+			jogadaAjogar=joga5CPU(e.ultima_jogada,e.mao[e.ultimo_jogador], 0);
 			if (jogadaAjogar==0){
 				jogadaAjogar = jogaDuTri(e.mao[e.ultimo_jogador]);
 				if(jogadaAjogar==0){
@@ -1031,7 +1047,7 @@ STATE joga_cpu (STATE e) {
 	if (e.ultimo_jogador==0) {
 		e.ultimo_jogador=1;
 		if (e.passar>=3){
-			jogadaAjogar=joga5CPU(e.ultima_jogada,e.mao[e.ultimo_jogador]);
+			jogadaAjogar=joga5CPU(e.ultima_jogada,e.mao[e.ultimo_jogador], 0);
 			if (jogadaAjogar==0){
 				jogadaAjogar = jogaDuTri(e.mao[e.ultimo_jogador]);
 				if(jogadaAjogar==0){
@@ -1068,7 +1084,7 @@ STATE joga_cpu (STATE e) {
 	if (e.ultimo_jogador==1) {
 		e.ultimo_jogador=2;
 		if (e.passar>=3){
-			jogadaAjogar=joga5CPU(e.ultima_jogada,e.mao[e.ultimo_jogador]);
+			jogadaAjogar=joga5CPU(e.ultima_jogada,e.mao[e.ultimo_jogador], 0);
 			if (jogadaAjogar==0){
 				jogadaAjogar = jogaDuTri(e.mao[e.ultimo_jogador]);
 				if(jogadaAjogar==0){
