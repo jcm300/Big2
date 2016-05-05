@@ -99,6 +99,8 @@ int carta_existe(long long int ESTADO, int naipe, int valor) {
 
 /**
 Número de cartas presentes na mão
+@param m Mao onde se verifca o número de cartas
+@return Número de cartas existentes na mão
 */
 int nroCartas(MAO m){
 	int r = 0;
@@ -132,7 +134,11 @@ int existeValor (MAO mao, int v) {
 	return n;
 }
 
-/** Função que adiciona à primeira mão as cartas que estejam presentes na segunda mão*/
+/** Função que adiciona à primeira mão as cartas que estejam presentes na segunda mão
+@param mao mao qe contém as cartas a serem adicionadas
+@param s mao onde as cartas vao ser adicionadas
+@return mao que contém as cartas escolhidas
+*/
 MAO adiciona_cartas (MAO mao, MAO s) {
 	int n,v;
 	for(v = 0; v < 13; v++) {
@@ -144,8 +150,11 @@ MAO adiciona_cartas (MAO mao, MAO s) {
 	return mao;
 }
 
-
-/** Função que retira da primeira mão as cartas que estejam presentes na segunda mão*/
+/** Função que retira da primeira mão as cartas que estejam presentes na segunda mão
+@param mao mao que contém as cartas a serem removidas
+@param s mao de onde serão retiradas as carta
+@return mao resultante de remover as cartas 
+*/
 MAO retira_cartas (MAO mao, MAO s) {
 	int n,v;
 	for(v = 0; v < 13; v++) {
@@ -159,6 +168,8 @@ MAO retira_cartas (MAO mao, MAO s) {
 
 /**
 Função que distribui as cartas
+@param e situação atual do jogo 
+@return estado após a distribuição das cartas aos players
 */
 STATE distribuir(STATE e) {
 	/**
@@ -178,7 +189,6 @@ STATE distribuir(STATE e) {
 				e.tamanho[i] += 1;
 			}
 		}
-		//ESTADO = retira_cartas(ESTADO ,e.mao[i]);
 	}
 	e.mao[3] = ESTADO;
 	e.tamanho[3] = 13;
@@ -189,7 +199,7 @@ STATE distribuir(STATE e) {
 Imprime o html correspondente a uma carta
 @param x A coordenada x da carta
 @param y A coordenada y da carta
-@param STATE	O estado atual
+@param e O estado atual
 @param naipe	O naipe da carta (inteiro entre 0 e 3)
 @param valor	O valor da carta (inteiro entre 0 e 12)
 */
@@ -208,7 +218,11 @@ void imprime_carta(int x, int y, STATE e, int naipe, int valor) {
 	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", script, x, y, BARALHO, rank[valor], suit[naipe]);
 }
 
-/** Imprime o html correspondente a uma carta de "costas" */
+/** Imprime o html correspondente a uma carta de "costas" 
+@param x A coordenada x da carta
+@param y A coordenada y da carta
+@param e O estado atual
+*/
 void imprime_carta_costas(int x, int y, STATE e) {
 	char script[10240];
 	sprintf(script, "%s?%s", SCRIPT, estado2str(e));
@@ -218,7 +232,13 @@ void imprime_carta_costas(int x, int y, STATE e) {
 
 /**
 Imprime uma mão consoante o x e o y
+@param x A coordenada x da carta
+@param y A coordenada y da carta
+@param e O estado atual
+@param mao mao a imprimir
+@param m indica se a mao e referente ao jogador ou aos bots
 */
+
 void imprime_mao(int x, int y, STATE e, MAO mao, int m) {
 	int n, v;
 
@@ -261,6 +281,10 @@ void imprime_mao(int x, int y, STATE e, MAO mao, int m) {
 
 /**
 Imprime uma mão de "costas" consoante o x e o y
+@param x A coordenada x da carta
+@param y A coordenada y da carta
+@param e O estado atual
+@param mao mao a imprimir
 */
 void imprime_mao_costas(int x, int y, STATE e, MAO mao) {
 	int n, i;
@@ -698,7 +722,6 @@ MAO jogaStraightFlush(MAO mao, MAO jogadaAnt){
 MAO jogaQuads (MAO mao,MAO jogadaAnt) {
 	int n,v;
 	MAO temp=0;
-	if (nroCartas(mao)<5) return 0;
 	for(v = 0; v < 13; v ++){
 		if(carta_existe(mao,0,v) && carta_existe(mao,1,v) && carta_existe(mao,2,v) && carta_existe(mao,3,v)) {
 			for (n=0; n<4; n++) {
@@ -721,7 +744,6 @@ MAO jogaQuads (MAO mao,MAO jogadaAnt) {
 MAO jogaFlush (MAO mao, MAO jogadaAnt) {
 	int n,v,j=0;
 	MAO temp=0;
-	if (nroCartas(mao)<5) return 0;
 	for(n = 0; n < 4; n ++){
 		j=0;
 		temp=0;
@@ -742,7 +764,6 @@ MAO jogaFullHouse (MAO mao,MAO jogadaAnt) {
 	int n,v,n2,v2,j=0;
 	MAO temp=0;
 	MAO temp2=0;
-	//if (nroCartas(mao)<5) return 0;
 	for(v = 0; v < 13; v ++){
 		j=0;
 		temp=0;
