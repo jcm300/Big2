@@ -335,7 +335,7 @@ STATE fim(STATE e){
 	for(i = 0; i < 4; i ++, y += 120){
 		if(e.tamanho[i] == 0)
 			printf("<text x=\"%d\" y=\"%d\" fill=\"black\" font-size=\"25\">Winner (%d) </text>\n", x, y , e.pontos[i]);
-			//printf("<p>%d  %s%s Winner(%d)</p>\n", i+1, tabs, tabs,e.pontos[i]);
+			/*printf("<p>%d  %s%s Winner(%d)</p>\n", i+1, tabs, tabs,e.pontos[i]);*/
 		else{
 			if(e.tamanho[i] <= 9 && e.tamanho[i] > 0)
 				e.pontos[i] += -e.tamanho[i];
@@ -344,7 +344,7 @@ STATE fim(STATE e){
 			else if(e.tamanho[i] == 13)
 				e.pontos[i] += (-3)* e.tamanho[i];
 			printf("<text x=\"%d\" y=\"%d\" fill=\"black\" font-size=\"25\"> %d </text>\n", x+30, y , e.pontos[i]);
-			//printf("<p>%d %s%s %d\n</p>\n", i+1, tabs, tabs,e.pontos[i]);
+			/*printf("<p>%d %s%s %d\n</p>\n", i+1, tabs, tabs,e.pontos[i]);*/
 		}
 	}
 	
@@ -598,10 +598,10 @@ int identificaJogada(MAO jogada){
 /**Função encarregue de verificar a validade da seleção do jogador*/
 int jogadaValida(MAO jogadaAnt, MAO jogadaAtual, int passar){
 
-	int nroAg, nroAnt;
+	int nroAg, nroAnt, tipo;
 	nroAnt = nroCartas(jogadaAnt);
 	nroAg = nroCartas(jogadaAtual);
-	int tipo = identificaJogada(jogadaAnt);
+	tipo = identificaJogada(jogadaAnt);
 
 	if(nroAg <= 0 || nroAg >5 || nroAg == 4) return 0;
 	else if(nroAg == 5){ 
@@ -1216,6 +1216,7 @@ void novoJogo(STATE *e){
 	for (i=0;i<4;i++) {
 		e->mao[i]=0;
 		e->tamanho[i]=0;
+		e->pontos[i]=0;
 	}
 	e->acao=e->ultimo_jogador=e->passar=0;
 	e->selecao=e->ultima_jogada=0;
@@ -1232,10 +1233,10 @@ int main() {
     	for (i=0;i<4;i++) {
 	    	e.mao[i]=0;
     		e.tamanho[i]=0;
-		e.pontos[i]=0;
+			e.pontos[i]=0;
     	}
-	e.selecao=0x000000000000;
-	e.ultima_jogada=0x000000000000;
+	e.selecao=0;
+	e.ultima_jogada=0;
 	e.ordem=e.acao = e.passar = e.ultimo_jogador = 0;
 	
 	printf("Content-Type: text/html; charset=utf-8\n\n");
