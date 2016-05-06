@@ -1169,7 +1169,7 @@ void imprime(STATE e) {
 			e=joga_cpu(e);
 	}
 	
-	if (e.acao==2) {
+	if (e.acao==2 && !carta_existe(e.mao[3],0,0)) {
 		e.passar++;
 		printf("<text x=\"500\" y=\"450\" fill=\"white\" font-size=\"20\">Passou</text>\n");
 		e.ultimo_jogador=3;
