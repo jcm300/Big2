@@ -1016,40 +1016,116 @@ Função encarrege de fazer os cpus jogar
 */
 STATE joga_cpu (STATE e) {
 	MAO jogadaAjogar;
-	int n;
-	for(n=0, n<3 , n++) {
-		e.ultimo_jogador=n;
+
+	if(e.ultimo_jogador == 3){
+		e.ultimo_jogador=0;
 		if (e.passar>=3){
-			jogadaAjogar=joga5CPU(e.ultima_jogada,e.mao[e.ultimo_jogador], n);
+			jogadaAjogar=joga5CPU(e.ultima_jogada,e.mao[e.ultimo_jogador], 0);
 			if (jogadaAjogar==0){
 				jogadaAjogar = jogaDuTri(e.mao[e.ultimo_jogador]);
 				if(jogadaAjogar==0){
-					e = joga_cartas_cpu(e, 10 + 120 * n);
-					e.mao[e.ultimo_jogador] = retira_cartas(e.mao[n], e.ultima_jogada);
-				}else{
+					e = joga_cartas_cpu(e, 10);
+					e.mao[e.ultimo_jogador] = retira_cartas(e.mao[0], e.ultima_jogada);
+				}
+				else{
 					e.ultima_jogada = jogadaAjogar;
-					e.mao[n] = retira_cartas(e.mao[n], e.ultima_jogada);
-					imprime_mao(500, 10 + 120 * n, e, e.ultima_jogada, 4);
+					e.mao[0] = retira_cartas(e.mao[0], e.ultima_jogada);
+					imprime_mao(500, 10, e, e.ultima_jogada, 4);
 					e.passar = 0;
 				}
-			}else {
-				imprime_mao(500, 10 + 120 * n, e, jogadaAjogar, 4);
+			}
+			else {
+				imprime_mao(500, 10, e, jogadaAjogar, 4);
 				e.mao[e.ultimo_jogador]=retira_cartas(e.mao[e.ultimo_jogador],jogadaAjogar);
 				e.ultima_jogada=jogadaAjogar;
 				e.passar=0;
 			}
-		}else {
+		} else {
 			if(nroCartas(e.ultima_jogada) == 5){
-				e=jogaComb(e,10 + 120 * n);
+				e=jogaComb(e,10);
 			} else {
-				e=joga_cartas_cpu(e,10 + 120 * n);
-				e.mao[n]=retira_cartas(e.mao[n],e.ultima_jogada);
+				e=joga_cartas_cpu(e,10);
+				e.mao[0]=retira_cartas(e.mao[0],e.ultima_jogada);
 			}
 		}
-		e.tamanho[n]=nroCartas(e.mao[n]);
-		if(e.tamanho[n] == 0){
+		e.tamanho[0]=nroCartas(e.mao[0]);
+		if(e.tamanho[0] == 0){
 			e.ultimo_jogador = 4;
 		} 
+	}
+
+	if (e.ultimo_jogador==0) {
+		e.ultimo_jogador=1;
+		if (e.passar>=3){
+			jogadaAjogar=joga5CPU(e.ultima_jogada,e.mao[e.ultimo_jogador], 0);
+			if (jogadaAjogar==0){
+				jogadaAjogar = jogaDuTri(e.mao[e.ultimo_jogador]);
+				if(jogadaAjogar==0){
+					e = joga_cartas_cpu(e, 130);
+					e.mao[e.ultimo_jogador] = retira_cartas(e.mao[1], e.ultima_jogada);
+				}
+				else{
+					e.ultima_jogada = jogadaAjogar;
+					e.mao[1] = retira_cartas(e.mao[1], e.ultima_jogada);
+					imprime_mao(500, 130, e, e.ultima_jogada, 4);
+					e.passar = 0;
+				}
+			}
+			else {
+			imprime_mao(500, 130, e, jogadaAjogar, 4);
+			e.mao[e.ultimo_jogador]=retira_cartas(e.mao[e.ultimo_jogador],jogadaAjogar);
+			e.ultima_jogada=jogadaAjogar;
+			e.passar=0;
+			}
+		} else {
+			if(nroCartas(e.ultima_jogada) == 5){
+				e=jogaComb(e,130);
+			} else {
+				e=joga_cartas_cpu(e,130);
+				e.mao[1]=retira_cartas(e.mao[1],e.ultima_jogada);
+			}
+		}
+		e.tamanho[1]=nroCartas(e.mao[1]);
+		if(e.tamanho[1] == 0){
+			e.ultimo_jogador = 4;
+		}
+	}
+
+	if (e.ultimo_jogador==1) {
+		e.ultimo_jogador=2;
+		if (e.passar>=3){
+			jogadaAjogar=joga5CPU(e.ultima_jogada,e.mao[e.ultimo_jogador], 0);
+			if (jogadaAjogar==0){
+				jogadaAjogar = jogaDuTri(e.mao[e.ultimo_jogador]);
+				if(jogadaAjogar==0){
+					e = joga_cartas_cpu(e, 250);
+					e.mao[e.ultimo_jogador] = retira_cartas(e.mao[2], e.ultima_jogada);
+				}
+				else{
+					e.ultima_jogada = jogadaAjogar;
+					e.mao[2] = retira_cartas(e.mao[2], e.ultima_jogada);
+					imprime_mao(500, 250, e, e.ultima_jogada, 4);
+					e.passar = 0;
+				}
+			}
+			else {
+			imprime_mao(500, 250, e, jogadaAjogar, 4);
+			e.mao[e.ultimo_jogador]=retira_cartas(e.mao[e.ultimo_jogador],jogadaAjogar);
+			e.ultima_jogada=jogadaAjogar;
+			e.passar=0;
+			}
+		} else {
+			if(nroCartas(e.ultima_jogada) == 5){
+				e=jogaComb(e,250);
+			} else {
+			e=joga_cartas_cpu(e,250);
+			e.mao[2]=retira_cartas(e.mao[2],e.ultima_jogada);
+			}
+		}
+		e.tamanho[2]=nroCartas(e.mao[2]);
+		if(e.tamanho[2] == 0){
+			e.ultimo_jogador = 4;
+		}
 	}
 	return e;
 }
