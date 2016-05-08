@@ -335,7 +335,6 @@ STATE fim(STATE e){
 	for(i = 0; i < 4; i ++, y += 120){
 		if(e.tamanho[i] == 0)
 			printf("<text x=\"%d\" y=\"%d\" fill=\"black\" font-size=\"25\">Winner (%d) </text>\n", x, y , e.pontos[i]);
-			/*printf("<p>%d  %s%s Winner(%d)</p>\n", i+1, tabs, tabs,e.pontos[i]);*/
 		else{
 			if(e.tamanho[i] <= 9 && e.tamanho[i] > 0)
 				e.pontos[i] += -e.tamanho[i];
@@ -344,7 +343,6 @@ STATE fim(STATE e){
 			else if(e.tamanho[i] == 13)
 				e.pontos[i] += (-3)* e.tamanho[i];
 			printf("<text x=\"%d\" y=\"%d\" fill=\"black\" font-size=\"25\"> %d </text>\n", x+30, y , e.pontos[i]);
-			/*printf("<p>%d %s%s %d\n</p>\n", i+1, tabs, tabs,e.pontos[i]);*/
 		}
 	}
 	
@@ -1011,121 +1009,57 @@ STATE joga_fst_cpu (STATE e) {
 	return e;
 }
 
-/**
-Função encarrege de fazer os cpus jogar
-*/
-STATE joga_cpu (STATE e) {
+STATE jogaUmCPU (STATE e, int n) {
 	MAO jogadaAjogar;
-
-	if(e.ultimo_jogador == 3){
-		e.ultimo_jogador=0;
-		if (e.passar>=3){
+	e.ultimo_jogador=n;
+	if (e.passar>=3){
 			jogadaAjogar=joga5CPU(e.ultima_jogada,e.mao[e.ultimo_jogador], 0);
 			if (jogadaAjogar==0){
 				jogadaAjogar = jogaDuTri(e.mao[e.ultimo_jogador]);
 				if(jogadaAjogar==0){
-					e = joga_cartas_cpu(e, 10);
-					e.mao[e.ultimo_jogador] = retira_cartas(e.mao[0], e.ultima_jogada);
-				}
-				else{
+					e = joga_cartas_cpu(e, 10 + 120 * n);
+					e.mao[e.ultimo_jogador] = retira_cartas(e.mao[n], e.ultima_jogada);
+				}else{
 					e.ultima_jogada = jogadaAjogar;
-					e.mao[0] = retira_cartas(e.mao[0], e.ultima_jogada);
-					imprime_mao(500, 10, e, e.ultima_jogada, 4);
+					e.mao[n] = retira_cartas(e.mao[n], e.ultima_jogada);
+					imprime_mao(500, 10 + 120 * n, e, e.ultima_jogada, 4);
 					e.passar = 0;
 				}
-			}
-			else {
-				imprime_mao(500, 10, e, jogadaAjogar, 4);
+			}else {
+				imprime_mao(500, 10 + 120 * n, e, jogadaAjogar, 4);
 				e.mao[e.ultimo_jogador]=retira_cartas(e.mao[e.ultimo_jogador],jogadaAjogar);
 				e.ultima_jogada=jogadaAjogar;
 				e.passar=0;
 			}
-		} else {
-			if(nroCartas(e.ultima_jogada) == 5){
-				e=jogaComb(e,10);
-			} else {
-				e=joga_cartas_cpu(e,10);
-				e.mao[0]=retira_cartas(e.mao[0],e.ultima_jogada);
-			}
+	}else {
+		if(nroCartas(e.ultima_jogada) == 5){
+			e=jogaComb(e,10 + 120 * n);
+		}else {
+			e=joga_cartas_cpu(e,10 + 120 * n);
+			e.mao[n]=retira_cartas(e.mao[n],e.ultima_jogada);
 		}
-		e.tamanho[0]=nroCartas(e.mao[0]);
-		if(e.tamanho[0] == 0){
-			e.ultimo_jogador = 4;
-		} 
+	}
+	e.tamanho[n]=nroCartas(e.mao[n]);
+	if(e.tamanho[n] == 0){
+		e.ultimo_jogador = 4;
+	}
+	return e; 
+}
+
+/**
+Função encarrege de fazer os cpus jogar
+*/
+STATE joga_cpu (STATE e) {
+	if(e.ultimo_jogador == 3){
+		e=jogaUmCPU(e,0);
 	}
 
 	if (e.ultimo_jogador==0) {
-		e.ultimo_jogador=1;
-		if (e.passar>=3){
-			jogadaAjogar=joga5CPU(e.ultima_jogada,e.mao[e.ultimo_jogador], 0);
-			if (jogadaAjogar==0){
-				jogadaAjogar = jogaDuTri(e.mao[e.ultimo_jogador]);
-				if(jogadaAjogar==0){
-					e = joga_cartas_cpu(e, 130);
-					e.mao[e.ultimo_jogador] = retira_cartas(e.mao[1], e.ultima_jogada);
-				}
-				else{
-					e.ultima_jogada = jogadaAjogar;
-					e.mao[1] = retira_cartas(e.mao[1], e.ultima_jogada);
-					imprime_mao(500, 130, e, e.ultima_jogada, 4);
-					e.passar = 0;
-				}
-			}
-			else {
-			imprime_mao(500, 130, e, jogadaAjogar, 4);
-			e.mao[e.ultimo_jogador]=retira_cartas(e.mao[e.ultimo_jogador],jogadaAjogar);
-			e.ultima_jogada=jogadaAjogar;
-			e.passar=0;
-			}
-		} else {
-			if(nroCartas(e.ultima_jogada) == 5){
-				e=jogaComb(e,130);
-			} else {
-				e=joga_cartas_cpu(e,130);
-				e.mao[1]=retira_cartas(e.mao[1],e.ultima_jogada);
-			}
-		}
-		e.tamanho[1]=nroCartas(e.mao[1]);
-		if(e.tamanho[1] == 0){
-			e.ultimo_jogador = 4;
-		}
+		e=jogaUmCPU(e,1);
 	}
 
 	if (e.ultimo_jogador==1) {
-		e.ultimo_jogador=2;
-		if (e.passar>=3){
-			jogadaAjogar=joga5CPU(e.ultima_jogada,e.mao[e.ultimo_jogador], 0);
-			if (jogadaAjogar==0){
-				jogadaAjogar = jogaDuTri(e.mao[e.ultimo_jogador]);
-				if(jogadaAjogar==0){
-					e = joga_cartas_cpu(e, 250);
-					e.mao[e.ultimo_jogador] = retira_cartas(e.mao[2], e.ultima_jogada);
-				}
-				else{
-					e.ultima_jogada = jogadaAjogar;
-					e.mao[2] = retira_cartas(e.mao[2], e.ultima_jogada);
-					imprime_mao(500, 250, e, e.ultima_jogada, 4);
-					e.passar = 0;
-				}
-			}
-			else {
-			imprime_mao(500, 250, e, jogadaAjogar, 4);
-			e.mao[e.ultimo_jogador]=retira_cartas(e.mao[e.ultimo_jogador],jogadaAjogar);
-			e.ultima_jogada=jogadaAjogar;
-			e.passar=0;
-			}
-		} else {
-			if(nroCartas(e.ultima_jogada) == 5){
-				e=jogaComb(e,250);
-			} else {
-			e=joga_cartas_cpu(e,250);
-			e.mao[2]=retira_cartas(e.mao[2],e.ultima_jogada);
-			}
-		}
-		e.tamanho[2]=nroCartas(e.mao[2]);
-		if(e.tamanho[2] == 0){
-			e.ultimo_jogador = 4;
-		}
+		e=jogaUmCPU(e,2);
 	}
 	return e;
 }
@@ -1199,14 +1133,13 @@ void imprime(STATE e) {
 Função encarregue de distribuir as cartas, caso estas não tenham sido já distribuídas, e de chamar a funçao que faz o jogo "correr"
  */
 void parse(STATE e) {
+	int i;
 
 	if(e.mao[0] == 0 && e.acao == 0) {
 		e=distribuir(e);
 	}
-	e.tamanho[0]=nroCartas(e.mao[0]);
-	e.tamanho[1]=nroCartas(e.mao[1]);
-	e.tamanho[2]=nroCartas(e.mao[2]);
-	e.tamanho[3]=nroCartas(e.mao[3]);
+	for(i=0;i<4;i++)
+		e.tamanho[i]=nroCartas(e.mao[i]);
 	imprime(e);
 }
 
@@ -1218,7 +1151,7 @@ void novoJogo(STATE *e){
 		e->tamanho[i]=0;
 		e->pontos[i]=0;
 	}
-	e->acao=e->ultimo_jogador=e->passar=0;
+	e->ordem=e->acao=e->ultimo_jogador=e->passar=0;
 	e->selecao=e->ultima_jogada=0;
 }
 
@@ -1230,14 +1163,8 @@ int main() {
 
 	STATE e;
 	int i;
-    	for (i=0;i<4;i++) {
-	    	e.mao[i]=0;
-    		e.tamanho[i]=0;
-			e.pontos[i]=0;
-    	}
-	e.selecao=0;
-	e.ultima_jogada=0;
-	e.ordem=e.acao = e.passar = e.ultimo_jogador = 0;
+    
+    novoJogo(&e);
 	
 	printf("Content-Type: text/html; charset=utf-8\n\n");
 	printf("<header><title>Big Two</title></header>\n");
@@ -1256,13 +1183,6 @@ int main() {
 	}
 	else if(e.acao == 5){
 		novoJogo(&e);
-		/*for (i=0;i<4;i++) {
-	    		e.mao[i]=0;
-    			e.tamanho[i]=0;
-			e.pontos[i]=0;
-		}
-		e.acao=e.ultimo_jogador=e.passar=0;
-		e.selecao=e.ultima_jogada=0;*/
 	}
 	parse(e);
 

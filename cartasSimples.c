@@ -335,7 +335,6 @@ STATE fim(STATE e){
 	for(i = 0; i < 4; i ++, y += 120){
 		if(e.tamanho[i] == 0)
 			printf("<text x=\"%d\" y=\"%d\" fill=\"black\" font-size=\"25\">Winner (%d) </text>\n", x, y , e.pontos[i]);
-			/*printf("<p>%d  %s%s Winner(%d)</p>\n", i+1, tabs, tabs,e.pontos[i]);*/
 		else{
 			if(e.tamanho[i] <= 9 && e.tamanho[i] > 0)
 				e.pontos[i] += -e.tamanho[i];
@@ -344,7 +343,6 @@ STATE fim(STATE e){
 			else if(e.tamanho[i] == 13)
 				e.pontos[i] += (-3)* e.tamanho[i];
 			printf("<text x=\"%d\" y=\"%d\" fill=\"black\" font-size=\"25\"> %d </text>\n", x+30, y , e.pontos[i]);
-			/*printf("<p>%d %s%s %d\n</p>\n", i+1, tabs, tabs,e.pontos[i]);*/
 		}
 	}
 	
