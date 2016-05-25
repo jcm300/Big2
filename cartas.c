@@ -280,7 +280,7 @@ void imprime_mao(int x, int y, STATE e, MAO mao, int m) {
 }
 
 /**
-Imprime uma mão de "costas" consoante o x e o y
+Imprime uma mão de "costas" partindo nas coordenadas fornecidas 
 @param x A coordenada x da carta
 @param y A coordenada y da carta
 @param e O estado atual
@@ -296,7 +296,11 @@ void imprime_mao_costas(int x, int y, STATE e, MAO mao) {
 }
 
 /**
-Imprime os butões baralhar, passar e jogar
+Imprime os butões baralhar, passar e jogar e sugestão
+@param x A coordenada x do primeiro botão
+@param y A coordenada x do primeiro botão
+@param e Estado atual do jogo	
+@param jv Variável que indica o estado da jogada do jogador(se está é válida ou não)
 */
 void imprime_butoes(int x, int y, STATE e, int jv){
 	char script[10240];	
@@ -323,6 +327,11 @@ void imprime_butoes(int x, int y, STATE e, int jv){
 	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/Ordenar.png\" /></a>\n", script, x +400, y, BOTOES);
 }
 
+/**
+Função encarregue de registar os scores dos jogadores e de dar continuidade ao jogo
+@param e Estado final do jogo 
+@return Estado do jogo com as pontuações atualizadas
+*/
 STATE fim(STATE e){
 
 	int x = 800;
@@ -357,6 +366,12 @@ STATE fim(STATE e){
 	return e;
 }
 
+/**
+Função que compara dois Flush's e verifica se a jogada é válida
+@param jogadaAnt Última mão a ser jogada
+@param jogadaAtual Intenção de jogada atual 
+@return 1 se a jogada for válida, 0 caso contrário
+*/
 int comparaFlush(MAO jogadaAnt, MAO jogadaAtual){
 	int c  = 0, v1 = 0, v2 = 0, n1 = 0, n2 = 0;
 
@@ -390,7 +405,10 @@ int comparaFlush(MAO jogadaAnt, MAO jogadaAtual){
 }
 
 /**
-Compara duas mãos por forma a validar a jogadaAtual em relação a jogadaAnt
+Função encarregue de comparar as jogadas que não são combinações
+@param jogadaAnt Última mão a ser jogada
+@param jogadaAtual Intenção de jogada atual 
+@return 1 se a jogada for válida, 0 caso contrário
 */
 int comparaMaos(MAO jogadaAnt, MAO jogadaAtual){
 	int c  = 0, v1 = 0, v2 = 0, n1 = 0, n2 = 0;
@@ -424,7 +442,11 @@ int comparaMaos(MAO jogadaAnt, MAO jogadaAtual){
 	else return (v1<v2);
 }
 
-/**Verifica se as cartas selecionadas pelo jogador são do mesmo valor*/
+/**
+Função chamada para verificar, caso a jogada em causa não seja uma combinação, se as carta presentes na mesma são todas do mesmo valor
+@param jogadaAtual Intenção de jogada do player
+@return 1 caso não hajam cartas diferentes, 0 caso contrário 
+*/
 int cartasDiferentes(MAO jogadaAtual){
 	int c = 0, ct;	
 
@@ -446,6 +468,12 @@ int cartasDiferentes(MAO jogadaAtual){
 	return 1;
 }
 
+/**
+Função que compara dois Quads's e verifica se a jogada é válida
+@param jogadaAnt Última mão a ser jogada
+@param jogadaAtual Intenção de jogada atual 
+@return 1 se a jogada for válida, 0 caso contrário
+*/
 int comparaQuads(MAO jogadaAnt, MAO jogadaAtual){
 	int v  = 0, v1 = 0, v2 = 0;
 	
@@ -471,6 +499,13 @@ int comparaQuads(MAO jogadaAnt, MAO jogadaAtual){
 	return (v1<v2);
 }
 
+
+/**
+Função que compara dois Straight's e Straight Flush' Straight Flush's verifica se a jogada é válida
+@param jogadaAnt Última mão a ser jogada
+@param jogadaAtual Intenção de jogada atual 
+@return 1 se a jogada for válida, 0 caso contrário
+*/
 int comparaStrEStrFlush(MAO jogadaAtual, MAO jogadaAnt){
 	int n1,n2;
 	if(jogadaAnt == 0) return 1;
@@ -489,6 +524,13 @@ int comparaStrEStrFlush(MAO jogadaAtual, MAO jogadaAnt){
 	return (comparaMaos(jogadaAnt,jogadaAtual));
 }
 
+
+/**
+Função que compara dois Full Houses e verifica se a jogada é válida
+@param jogadaAnt Última mão a ser jogada
+@param jogadaAtual Intenção de jogada atual 
+@return 1 se a jogada for válida, 0 caso contrário
+*/
 int comparaFullHouse(MAO jogadaAnt, MAO jogadaAtual){
 	int v = 0, v1 = 0, v2 = 0, c, n;
 	
@@ -524,6 +566,11 @@ int comparaFullHouse(MAO jogadaAnt, MAO jogadaAtual){
 	return (v1<v2);
 }
 
+/**
+Função que identifica se a jogada se trata de uma combinação de entre as diferentes combinações existentes
+@param jogada Combinação a identificar
+@return Valor de 1 a 5 para uma combinação válida e 0 caso esta não seja válida 
+*/
 int identificaJogada(MAO jogada){
 	int n1, n2, n, v, vt, c;
 
@@ -593,7 +640,12 @@ int identificaJogada(MAO jogada){
 	return 0;
 }
 
-/**Função encarregue de verificar a validade da seleção do jogador*/
+/**Função encarregue de verificar a validade da seleção do jogador
+@param jogadaAnt Última jogada a ser efetuada, se alguma
+@param jogadaAtual Intenção de jogada do player
+@param passar Número de vezes consecutivas que foi efetuado o passar imediatamente antes do turno do player
+@return	1 se a jogada for válida, 0 caso contrário
+*/
 int jogadaValida(MAO jogadaAnt, MAO jogadaAtual, int passar){
 
 	int nroAg, nroAnt, tipo;
@@ -645,6 +697,12 @@ int jogadaValida(MAO jogadaAnt, MAO jogadaAtual, int passar){
 }
 
 
+/**
+Função encarregue de procurar um Straight válido na mão dos bot's
+@param mao Mao do bot onde se irá procurar por um Straight
+@param jogadaAnt Última jogada a ser efetuada no jogo
+@return Uma mão diferente caso se encontre um Straight válido, 0 caso contrário
+*/
 MAO jogaStraight(MAO mao, MAO jogadaAnt){
 	MAO temp;
 	int vt, n, v, nt;
@@ -678,6 +736,12 @@ MAO jogaStraight(MAO mao, MAO jogadaAnt){
 }
 
 
+/**
+Função encarregue de procurar um Straight Flush válido na mão dos bot's
+@param mao Mao do bot onde se irá procurar por um Straight Flush
+@param jogadaAnt Última jogada a ser efetuada no jogo
+@return Uma mão diferente caso se encontre um Straight Flush válido, 0 caso contrário
+*/
 MAO jogaStraightFlush(MAO mao, MAO jogadaAnt){
 	MAO temp;
 	int vt, n, v;
@@ -704,8 +768,12 @@ MAO jogaStraightFlush(MAO mao, MAO jogadaAnt){
 }
 
 
-
-
+/**
+Função encarregue de procurar um Quads válido na mão dos bot's
+@param mao Mao do bot onde se irá procurar por um Quads
+@param jogadaAnt Última jogada a ser efetuada no jogo
+@return Uma mão diferente caso se encontre um Quads válido, 0 caso contrário
+*/
 MAO jogaQuads (MAO mao,MAO jogadaAnt) {
 	int n,v;
 	MAO temp=0;
@@ -728,6 +796,13 @@ MAO jogaQuads (MAO mao,MAO jogadaAnt) {
 	return 0;
 }
 
+
+/**
+Função encarregue de procurar um Flush válido na mão dos bot's
+@param mao Mao do bot onde se irá procurar por um Flush
+@param jogadaAnt Última jogada a ser efetuada no jogo
+@return Uma mão diferente caso se encontre um Flush válido, 0 caso contrário
+*/
 MAO jogaFlush (MAO mao, MAO jogadaAnt) {
 	int n,v,j=0;
 	MAO temp=0;
@@ -747,6 +822,13 @@ MAO jogaFlush (MAO mao, MAO jogadaAnt) {
 	return 0;
 }
 
+
+/**
+Função encarregue de procurar um Full House válido na mão dos bot's
+@param mao Mao do bot onde se irá procurar por um Full House 
+@param jogadaAnt Última jogada a ser efetuada no jogo
+@return Uma mão diferente caso se encontre um Full House válido, 0 caso contrário
+*/
 MAO jogaFullHouse (MAO mao,MAO jogadaAnt) {
 	int n,v,n2,v2,j=0;
 	MAO temp=0;
@@ -781,6 +863,12 @@ MAO jogaFullHouse (MAO mao,MAO jogadaAnt) {
 	return 0;
 }
 
+/**
+Função encarregue de jogar uma combinação, se possível, pelos bots
+@param e Guarda o estado atual do jogo
+@param y Coordenada inicial onde serão impressas as cartas jogadas pelo primeiro bot
+@return Estado do jogo após as jogadas dos bots
+*/
 STATE jogaComb(STATE e, int y){
 	MAO jogadaAjogar  = 0x0000000000000;
 	int tjogada = identificaJogada(e.ultima_jogada);
@@ -825,7 +913,10 @@ STATE jogaComb(STATE e, int y){
 
 
 /**
-Realiza uma jogada tendo em conta a mão e a ultima_jogada
+Função que realiza as jogadas de 1, 2 e 3 cartas pelos bots
+@param e Guarda o estado do jogo
+@param y Coordenada y onde será impressa a jogada do bot
+@return Estado do jogo após o término do turno do bot
 */
 STATE joga_cartas_cpu (STATE e, int y) {
 	int n, v;
@@ -868,7 +959,9 @@ STATE joga_cartas_cpu (STATE e, int y) {
 }
 
 /**
-Função encarregue de encontrar uma possível jogada para player
+Função encarregue de encontrar uma possível jogada de 1,2 e 3 cartas para o player
+@param e Guarda o estado atual do jogo
+@return Estado do jogo contendo a sugestão dada ao player
 */
 STATE sugereDuTri (STATE e) {
 	int n, v;
@@ -906,6 +999,12 @@ STATE sugereDuTri (STATE e) {
 	return e;
 }
 
+
+/**
+Função encarregue de encontrar uma possível combinação para o player
+@param e Guarda o estado atual do jogo
+@return Estado do jogo contendo a sugestão dada ao player
+*/
 STATE sugereComb(STATE e){
 	MAO jogadaAjogar;
 	MAO  temp = 0x0000000000000;
@@ -938,8 +1037,14 @@ STATE sugereComb(STATE e){
 	return e;
 }
 
-STATE sugereJogada(STATE e){
-	if(e.passar >=3){
+/**
+Realiza uma sugestão ao player baseada na última jogad, no número de passes consecutivos e na mão atual do player
+@param e Estado atual do jogo
+@param fst Indica se o player é o primeiro a jogar
+@return Estado do jogo após a sugestão dada ao player
+*/
+STATE sugereJogada(STATE e, int fst){
+	if(e.passar >=3 || fst){
 		e = sugereComb(e);
 		if(e.selecao == 0) e = sugereDuTri(e);
 	}
@@ -949,7 +1054,13 @@ STATE sugereJogada(STATE e){
 	return e;
 }
 
-
+/**
+Função encarregue de gerir as jogadas de combinações por parte dos bots, agindo tendo em conta a última combinação a ser jogada bem como se o bot é o primeiro a jogar
+@param ultima_jogada Última jogada efetuada na partida
+@param mao Mão do bot
+@param fst Indica se o bot é o primeiro a jogar
+@return Devolve 0 caso não haja combinação possível ou uma mão caso contrário
+*/
 MAO joga5CPU(MAO ultima_jogada, MAO mao, int fst) {
 	MAO jogadaAjogar;
 	jogadaAjogar=jogaStraight(mao,ultima_jogada);
@@ -960,6 +1071,12 @@ MAO joga5CPU(MAO ultima_jogada, MAO mao, int fst) {
 	return jogadaAjogar;
 }
 
+
+/**
+Função encarregue de efetuar as jogadas de 1, 2 e 3 cartas pelos bots
+@param mao Mao do bot
+@param Jogada a efetuar pelo bot
+*/
 MAO jogaDuTri(MAO mao){
 	int v, n, c;
 	MAO jogada;
@@ -984,7 +1101,9 @@ MAO jogaDuTri(MAO mao){
 
 
 /**
-Se os cpus tiverem o 3 de ouros esta função joga o 3 de ouros
+Função chamada quando o 3 de ouros se encontrar na mão de um dos bots e que realiza a jogada por estes
+@param e Estado incial do jogo
+@return Estado após a jogada do primeiro bot
 */	
 STATE joga_fst_cpu (STATE e) {
 	int y,i;
@@ -1009,6 +1128,13 @@ STATE joga_fst_cpu (STATE e) {
 	return e;
 }
 
+
+/**
+Função que gere a jogada de cada um dos bots
+@param e Estado atual do jogo
+@param n Identifica o bobot que irá efetuar a jogada
+@return Estado do jogo após o turno do bot atual
+*/
 STATE jogaUmCPU (STATE e, int n) {
 	MAO jogadaAjogar;
 	e.ultimo_jogador=n;
@@ -1047,7 +1173,9 @@ STATE jogaUmCPU (STATE e, int n) {
 }
 
 /**
-Função encarrege de fazer os cpus jogar
+Função encarrege de fazer os bots jogar
+@param e Estado atual do jogo
+@return Estado após os bots realizarem o seu turno
 */
 STATE joga_cpu (STATE e) {
 	if(e.ultimo_jogador == 3){
@@ -1086,7 +1214,10 @@ void imprime(STATE e) {
 	}
 	
 	if(e.acao == 4){
-		e=sugereJogada (e); 
+		if(carta_existe(e.mao[3], 0, 0)){
+			e=sugereJogada (e, 1); 
+		}
+		else e=sugereJogada(e, 0);
 		e.acao = 0;
 	}
 
@@ -1131,6 +1262,7 @@ void imprime(STATE e) {
 }
 /**
 Função encarregue de distribuir as cartas, caso estas não tenham sido já distribuídas, e de chamar a funçao que faz o jogo "correr"
+@param e Estado do jogo
  */
 void parse(STATE e) {
 	int i;
@@ -1143,6 +1275,10 @@ void parse(STATE e) {
 	imprime(e);
 }
 
+/**
+Faz o reset das pontuações e inicia o jogo de novo
+@param e Estado do jogo que será reiniciado
+*/
 void novoJogo(STATE *e){
 	int i;
 

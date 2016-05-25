@@ -8,6 +8,12 @@ instalar : $(EXEC)
 	sudo cp -r botoes /var/www/html
 	touch instalar
 
+arch : $(EXEC)
+	sudo cp $(EXEC) /srv/http/cgi-bin
+	sudo cp -r cards /srv/http
+	sudo cp -r botoes /srv/http
+	touch instalar
+
 $(EXEC): $(OBJS)
 	$(CC) $(CFLAGS) -o $(EXEC) $(OBJS)
 
