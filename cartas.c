@@ -1139,12 +1139,12 @@ STATE jogaUmCPU (STATE e, int n) {
 	MAO jogadaAjogar;
 	e.ultimo_jogador=n;
 	if (e.passar>=3){
-			jogadaAjogar=joga5CPU(e.ultima_jogada,e.mao[e.ultimo_jogador], 0);
+			jogadaAjogar=joga5CPU(e.ultima_jogada,e.mao[n], 0);
 			if (jogadaAjogar==0){
-				jogadaAjogar = jogaDuTri(e.mao[e.ultimo_jogador]);
+				jogadaAjogar = jogaDuTri(e.mao[n]);
 				if(jogadaAjogar==0){
 					e = joga_cartas_cpu(e, 10 + 120 * n);
-					e.mao[e.ultimo_jogador] = retira_cartas(e.mao[n], e.ultima_jogada);
+					e.mao[n] = retira_cartas(e.mao[n], e.ultima_jogada);
 				}else{
 					e.ultima_jogada = jogadaAjogar;
 					e.mao[n] = retira_cartas(e.mao[n], e.ultima_jogada);
@@ -1153,7 +1153,7 @@ STATE jogaUmCPU (STATE e, int n) {
 				}
 			}else {
 				imprime_mao(500, 10 + 120 * n, e, jogadaAjogar, 4);
-				e.mao[e.ultimo_jogador]=retira_cartas(e.mao[e.ultimo_jogador],jogadaAjogar);
+				e.mao[n]=retira_cartas(e.mao[n],jogadaAjogar);
 				e.ultima_jogada=jogadaAjogar;
 				e.passar=0;
 			}
@@ -1197,7 +1197,7 @@ Esta função está encarregue de imprimir o estado do jogo tendo em conta certo
 */
 void imprime(STATE e) {
 	int jv;
-	
+	int i;
 	
 	printf("<svg height = \"600\" width = \"1050\">\n");
 	printf("<rect x = \"0\" y = \"0\" height = \"600\" width = \"1050\" style = \"fill:#007700\"/>\n"); 
@@ -1242,9 +1242,7 @@ void imprime(STATE e) {
 		e=joga_cpu(e);
 	}
 	
-	imprime_mao(10,10,e,e.mao[0], 0);
-	imprime_mao(10,130,e,e.mao[1],1);
-	imprime_mao(10,250,e,e.mao[2],2);
+	for(i = 0; i < 3; i ++) imprime_mao(10,10+ 120*i,e,e.mao[i], i);
 	imprime_mao(10,390,e,e.mao[3],3);
 
 	if (!(e.tamanho[0] && e.tamanho[1] && e.tamanho[2] && e.tamanho[3])) {
