@@ -1,4 +1,0 @@
-Criar menu
-Validar:
--Straight
--Flush
