@@ -1,3 +1,5 @@
+#include "estruturas.h"
+
 /**
 Função encarregue de procurar um Straight válido na mão dos bot's
 @param mao Mao do bot onde se irá procurar por um Straight

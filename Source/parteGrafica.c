@@ -1,3 +1,6 @@
+#include "estruturas.h"
+
+
 /**
 Imprime o html correspondente a uma carta
 @param x A coordenada x da carta

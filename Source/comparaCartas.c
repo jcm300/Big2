@@ -1,3 +1,5 @@
+#include "estruturas.h"
+
 /**
 Função que compara dois Flush's e verifica se a jogada é válida
 @param jogadaAnt Última mão a ser jogada
