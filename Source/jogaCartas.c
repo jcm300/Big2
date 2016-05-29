@@ -1,4 +1,9 @@
+#include <stdio.h>
 #include "estruturas.h"
+#include "funcoesBasicas.h"
+#include "comparaCartas.h"
+#include "parteGrafica.h"
+#include "jogaCartas.h"
 
 /**
 Função encarregue de procurar um Straight válido na mão dos bot's

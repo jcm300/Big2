@@ -1,0 +1,15 @@
+MAO jogaStraight(MAO mao, MAO jogadaAnt);
+MAO jogaStraightFlush(MAO mao, MAO jogadaAnt);
+MAO jogaQuads (MAO mao,MAO jogadaAnt);
+MAO jogaFlush (MAO mao, MAO jogadaAnt);
+MAO jogaFullHouse (MAO mao,MAO jogadaAnt);
+STATE jogaComb(STATE e, int y);
+STATE joga_cartas_cpu (STATE e, int y);
+STATE sugereDuTri (STATE e);
+STATE sugereComb(STATE e);
+STATE sugereJogada(STATE e, int fst);
+MAO joga5CPU(MAO ultima_jogada, MAO mao, int fst);
+MAO jogaDuTri(MAO mao);
+STATE joga_fst_cpu (STATE e);
+STATE jogaUmCPU (STATE e, int n);
+STATE joga_cpu (STATE e);

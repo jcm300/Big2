@@ -1,0 +1,11 @@
+STATE str2estado (char* str);
+char* estado2str (STATE e);
+int indice(int naipe, int valor);
+long long int add_carta(long long int ESTADO, int naipe, int valor);
+long long int rem_carta(long long int ESTADO, int naipe, int valor);
+int carta_existe(long long int ESTADO, int naipe, int valor);
+int nroCartas(MAO m);
+int valor_existe(MAO mao, int valor);
+int existeValor (MAO mao, int v);
+MAO adiciona_cartas (MAO mao, MAO s);
+MAO retira_cartas (MAO mao, MAO s);

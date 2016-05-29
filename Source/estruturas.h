@@ -1,8 +1,15 @@
+#define SCRIPT		"http://127.0.0.1/cgi-bin/cartas"
+#define BARALHO		"http://127.0.0.1/cards"
+#define BOTOES		"http://127.0.0.1/botoes"
+
+#define NAIPES		"DCHS"
+#define VALORES		"3456789TJQKA2"
+#define FORMATO 	"%lld_%lld_%lld_%lld_%d_%d_%d_%d_%d_%d_%d_%d_%lld_%d_%d_%d_%lld_%d"
+
 /**
 tipo mao definido para representar long long int
 */
 typedef long long int MAO;
-
 
 /**
 Guarda o estado do jogo
@@ -21,7 +28,3 @@ typedef struct {
   	int acao, passar, ultimo_jogador, ordem;
   	MAO ultima_jogada;
 } STATE;
-
-
-
-

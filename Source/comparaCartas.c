@@ -1,4 +1,6 @@
 #include "estruturas.h"
+#include "funcoesBasicas.h"
+#include "comparaCartas.h"
 
 /**
 Função que compara dois Flush's e verifica se a jogada é válida

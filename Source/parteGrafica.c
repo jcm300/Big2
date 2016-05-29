@@ -1,5 +1,7 @@
+#include <stdio.h>
 #include "estruturas.h"
-
+#include "funcoesBasicas.h"
+#include "parteGrafica.h"
 
 /**
 Imprime o html correspondente a uma carta
