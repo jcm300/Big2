@@ -1,4 +1,0 @@
-Team_Name:LI_II
-ID:li_ii
-Project_Name: BigTwo 
-Project_Key:BIG
