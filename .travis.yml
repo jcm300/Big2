@@ -6,4 +6,5 @@ compiler:
 before_script:
     - cd src
 script:
+    - make limpar
     - make
