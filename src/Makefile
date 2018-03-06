@@ -14,6 +14,8 @@ arch : $(EXEC)
 	sudo cp -r botoes /srv/http
 	touch instalar
 
+travis : $(EXEC)
+
 $(EXEC): $(OBJS)
 	$(CC) $(CFLAGS) -o $(EXEC) $(OBJS)
 

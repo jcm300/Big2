@@ -6,4 +6,4 @@ compiler:
 before_script:
     - cd src
 script:
-    - make
+    - make travis
